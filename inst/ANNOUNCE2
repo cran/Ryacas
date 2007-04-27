@@ -1,0 +1,83 @@
+
+This is to announce that Ryacas has moved to the CRAN
+(from the Omegahat) repository.
+
+Also a new version of Ryacas is being released: Ryacas 0.2-4.
+
+---
+
+A partial lists of changes is shown here:
+
+o Ryacas 0.2-4 will use yacas 1.0.62 on all platforms.
+  (It previously used yacas 1.0.61 on Windows and yacas 1.0.62 
+  on other platforms.)
+
+o The binary files 'yacas.exe' and 'scripts.dat' for Windows are 
+  no longer included in Ryacas. Instead, a new installation procedure
+  has been developed for Windows users only to install both
+  Ryacas and yacas:
+
+	install.packages("Ryacas, dep = TRUE)
+	library(Ryacas)
+	yacasInstall()
+ 
+  On other platforms, as before, its up to the user to separately 
+  install yacas 1.0.62 .
+
+o on all platforms yacas now shuts down gracefully when the user 
+  detaches Ryacas:
+
+  	detach()
+
+---
+
+More information is on the Ryacas home page at:
+
+   http://code.google.com/p/ryacas/
+
+---
+
+WHAT IS RYACAS?
+
+Ryacas allows R users to access the yacas computer
+algebra system (CAS) from R.
+
+Ryacas can be used for exact arithmetic, symbolic
+math, ASCII pretty printing and translating R to
+TeX. 
+
+Ryacas contains 8 different R interfaces to yacas.
+Ryacas allows one to send R expressions,
+unprocessed yacas strings and certain other R
+objects to a separate yacas process from R and get
+back the result.  It also has facilities for
+manipulating yacas strings and R expressions
+destined for yacas processing.
+
+
+MORE INFO
+
+For overview, pointers to additional information,
+installation instructions and a sample session
+see the R home page at:
+
+    http://code.google.com/p/ryacas/
+
+The vignettes can be viewed online here:
+
+    http://ryacas.googlecode.com/svn/trunk/inst/doc/Ryacas.pdf
+    http://ryacas.googlecode.com/svn/trunk/inst/doc/Ryacas-Sym.pdf
+
+Once Ryacas is installed, pointers to additional
+information can be found with these R commands:
+
+    library(Ryacas)
+    package?Ryacas
+
+---
+
+Rob Goedman, goedman at mac dot com
+Gabor Grothendieck, ggrothendieck at gmail dot com
+Søren Højsgaard, Soren.Hojsgaard at agrsci dot dk
+Ayal Pinkus, apinkus at xs4all dot nl
+

@@ -1,0 +1,34 @@
+\contentsline {section}{\numberline {1}Introduction}{2}{section.1}
+\contentsline {section}{\numberline {2}\texttt {R}\ expressions, {\tt yacas}\ expressions and \texttt {Sym}\ objects}{2}{section.2}
+\contentsline {subsection}{\numberline {2.1}\texttt {R}\ expressions}{2}{subsection.2.1}
+\contentsline {subsection}{\numberline {2.2}{\tt yacas}\ expressions}{2}{subsection.2.2}
+\contentsline {subsection}{\numberline {2.3}\texttt {Sym}\ objects}{2}{subsection.2.3}
+\contentsline {section}{\numberline {3}A sample session}{3}{section.3}
+\contentsline {section}{\numberline {4}Simple \texttt {Yacas}\ calculations}{6}{section.4}
+\contentsline {subsection}{\numberline {4.1}Setting and clearing a variable}{6}{subsection.4.1}
+\contentsline {subsection}{\numberline {4.2}Symbolic and numerical evaluations, precision}{7}{subsection.4.2}
+\contentsline {subsection}{\numberline {4.3}Rational numbers}{8}{subsection.4.3}
+\contentsline {subsection}{\numberline {4.4}Symbolic calculation}{8}{subsection.4.4}
+\contentsline {subsection}{\numberline {4.5}Complex numbers and the imaginary unit}{9}{subsection.4.5}
+\contentsline {subsection}{\numberline {4.6}Recall the most recent line -- the \texttt {\%} operator}{10}{subsection.4.6}
+\contentsline {subsection}{\numberline {4.7}Printing with PrettyForm, PrettyPrint, TexForm and TeXForm}{10}{subsection.4.7}
+\contentsline {subsubsection}{\numberline {4.7.1}Standard form}{10}{subsubsection.4.7.1}
+\contentsline {subsubsection}{\numberline {4.7.2}Pretty form}{11}{subsubsection.4.7.2}
+\contentsline {subsubsection}{\numberline {4.7.3}TeX form}{11}{subsubsection.4.7.3}
+\contentsline {section}{\numberline {5}Commands}{12}{section.5}
+\contentsline {subsection}{\numberline {5.1}Factorial}{12}{subsection.5.1}
+\contentsline {subsection}{\numberline {5.2}Taylor expansions}{12}{subsection.5.2}
+\contentsline {subsection}{\numberline {5.3}Solving equations}{13}{subsection.5.3}
+\contentsline {subsubsection}{\numberline {5.3.1}Solving equations symbolically}{13}{subsubsection.5.3.1}
+\contentsline {subsubsection}{\numberline {5.3.2}Solving equations numerically}{13}{subsubsection.5.3.2}
+\contentsline {subsection}{\numberline {5.4}Expanding polynomials}{13}{subsection.5.4}
+\contentsline {subsection}{\numberline {5.5}Simplifying an expression}{13}{subsection.5.5}
+\contentsline {subsection}{\numberline {5.6}Analytical derivatives}{14}{subsection.5.6}
+\contentsline {subsection}{\numberline {5.7}Integration}{14}{subsection.5.7}
+\contentsline {subsection}{\numberline {5.8}Limits}{15}{subsection.5.8}
+\contentsline {subsection}{\numberline {5.9}Variable substitution}{15}{subsection.5.9}
+\contentsline {subsection}{\numberline {5.10}Solving ordinary differential equations}{15}{subsection.5.10}
+\contentsline {section}{\numberline {6}Matrices}{15}{section.6}
+\contentsline {subsection}{\numberline {6.1}Inverse}{16}{subsection.6.1}
+\contentsline {subsection}{\numberline {6.2}Determinant}{17}{subsection.6.2}
+\contentsline {section}{\numberline {7}Miscellaneous}{17}{section.7}
