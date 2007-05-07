@@ -1,3 +1,11 @@
+Changes in version 0.2-6
+
+o fixed bug in haveYacas
+
+o fixed bug in runYacas
+
+o removed some, but not all, platform dependencies from yacas.R
+
 Changes in version 0.2-5
 
 o srcfile= added to parse call in yacas() and Sys.putenv replaced with
