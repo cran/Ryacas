@@ -1,8 +1,18 @@
+Changes in version 0.2-9
+
+o DESCRIPTION file specifies XML version 2.1-0 or later
+
+Changes in version 0.2-8
+
+o added additional Solve examples to vignette
+
 Changes in version 0.2-7
 
 o socket timeout improvement from Petr Savicky
 
 o added Encoding: line to DESCRIPTION file
+
+o minor changes to satisfy R 2.6.0
 
 Changes in version 0.2-6
 
