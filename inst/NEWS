@@ -1,6 +1,14 @@
+Changes in version 0.2-10
+
+o fixes to pass R CMD CHECK
+
+o added INSTALL file
+
 Changes in version 0.2-9
 
 o DESCRIPTION file specifies XML version 2.1-0 or later
+
+o minor documentation improvements to address R 2.9.0
 
 Changes in version 0.2-8
 
