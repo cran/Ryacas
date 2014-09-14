@@ -31,8 +31,8 @@ Integrate.Expr <- function(f, x, a, b, ...) {
    } else Expr(substitute(integrate(f, a, b, x), as.list(match.call())[-1]))
 }
 
-Eval.Expr <- function(x, env = parent.frame(), ...) 
-	eval(yacas(x, ...)[[1]], env = env)
+Eval.Expr <- function(x, envir = parent.frame(), ...) 
+	eval(yacas(x, ...)[[1]], envir = envir)
 
 Simplify.Expr <- function(x, ...) 
    Expr(substitute(Simplify(x), as.list(match.call())[-1]))
@@ -46,7 +46,7 @@ List.Expr <- function(x, ...)
 N.Expr <- function(x, ...)
    Expr(substitute(N(x, ...), as.list(match.call())[-1]))
 
-Ver.Expr <- function(x) Exprq(Version())
+# Ver.Expr <- function(x) Exprq(Version())
 
 Clear.Expr <- function(x, ...)
    Expr(substitute(Clear(x, ...), as.list(match.call())[-1]))

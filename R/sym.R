@@ -50,14 +50,14 @@ Integrate.default <- function(f, x, a, b, ...) {
    } else Sym("Integrate(", x, ",", a, ",", b, ")", f)
 }
 
-Eval.Sym <- function(x, env = parent.frame(), ...) 
-	eval(yacas(unclass(x))[[1]], env = env)
+Eval.Sym <- function(x, envir = parent.frame(), ...) 
+	eval(yacas(unclass(x))[[1]], envir = envir)
 
 Simplify <- function(x, ...) UseMethod("Simplify")
 Simplify.default <- function(x, ...) Sym("Simplify(", x, ")")
 
 Factorial <- function(x) UseMethod("Factorial")
-Factorial.default <- function(x) Sym("Factorial(", x, ")")
+Factorial.default <- function(x) Sym("(", x, ")!")
 
 List <- function(x, ...) UseMethod("List")
 List.default <- function(x, ...) Sym("List(", paste(x, ..., sep = ","), ")")

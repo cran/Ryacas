@@ -14,6 +14,8 @@
 # package if not specified.  If YACAS_INIT is a directory, filename 
 # is assumed to be R.ys.
 
+
+.RyacasEnv <- new.env()
 yacasInvokeString <- function(method = c("socket", "system"), 
    yacas.init , yacas.args = "-pc --single-user-server") {
    yacas.invoke.string <- Sys.getenv("YACAS_INVOKE_STRING")
@@ -77,28 +79,28 @@ yacasStart <- function(verbose = FALSE, method = c("socket", "system"))
   #}
 
   Sys.sleep(1)
-  assign(".yacCon", socketConnection(host = "127.0.0.1", port=9734, 
-			server = FALSE,
-                      blocking = FALSE, open = "a+",
-                      encoding = getOption("encoding")), .GlobalEnv)
+  .RyacasEnv$yacCon <- socketConnection(host = "127.0.0.1", port=9734, 
+		server = FALSE, blocking = FALSE, open = "a+",
+                encoding = getOption("encoding"))
   invisible(0)
 }
 
 isConnection <- function(x) {
-	opened <- summary(x)$opened
-	identical(opened, "opened") || identical(opened, "closed")
+	opened <- try(summary(x)$opened, silent = TRUE)
+	!inherits(opened, "try-error") && 
+	   ( identical(opened, "opened") || identical(opened, "closed") )
 }
 
 yacasStop <- function(verbose = TRUE) 
 {
-  if (exists(".yacCon", .GlobalEnv)) {
+  if (exists("yacCon", .RyacasEnv)) {
       # if (isConnection(get(".yacCon", .GlobalEnv))) try(close(.yacCon))
-      .yacCon <- get(".yacCon", .GlobalEnv)
-      if (isConnection(.yacCon)) {
-         writeLines("Exit();", .yacCon)
-         try(close(.yacCon))
+      yacCon <- .RyacasEnv$yacCon
+      if (isConnection(yacCon)) {
+         writeLines("Exit();", yacCon)
+         try(close(yacCon))
       }
-      rm(.yacCon, envir = .GlobalEnv)
+      rm(yacCon, envir = .RyacasEnv)
   }
   # if (.Platform$OS.type == "windows") system("taskkill /im yacas.exe")
   if (verbose) cat("Thank you for using yacas\n")
@@ -106,7 +108,7 @@ yacasStop <- function(verbose = TRUE)
 }
 .Last.lib <- function(lib) 
 {
-  if (exists(".yacCon", .GlobalEnv)) yacasStop()
+  if (exists("yacCon", .RyacasEnv) && !is.null(.RyacasEnv$yacCon)) yacasStop()
   # next statement has no effect except on Windows XP Pro
 }
 
@@ -160,27 +162,28 @@ yacas.character <- function(x, verbose = FALSE, method, retclass = c("expression
 
     # if connection does not exist or its not a connection
     # or its closed, startup Yacas.
-    if (!exists(".yacCon", .GlobalEnv) ||
-	!isConnection(get(".yacCon", .GlobalEnv)) ||
-	summary(get(".yacCon", .GlobalEnv))$opened == "closed")
+    Ryacas <- asNamespace("Ryacas")
+    if (!exists("yacCon", .RyacasEnv) ||
+	!isConnection(get("yacCon", .RyacasEnv)) ||
+	summary(get("yacCon", .RyacasEnv))$opened == "closed")
 	    yacasStart(verbose = isTRUE(verbose))
 
     yac.res <- c()
 #	print(x)
     if (!is.na(pmatch(verbose, c(TRUE, "input")))) 
        cat("Sending to yacas:", x, "", sep = "\n")
-    .yacCon <- get(".yacCon", .GlobalEnv)
-    writeLines(x, .yacCon)
+    yacCon <- .RyacasEnv$yacCon
+    writeLines(x, yacCon)
 
     delim <- "]"
     yac.res <- c()
     while (sum(delim == yac.res) < 2)
     {
-      yac.out <- readLines(.yacCon)
+      yac.out <- readLines(yacCon)
       yac.res <- c(yac.res, yac.out)
     }
     yac.res <- yac.res[yac.res != ""]
-    flush(.yacCon)
+    flush(yacCon)
 
     # print all non-delims in verbose mode
     is.delim <- yac.res == delim
@@ -414,10 +417,10 @@ yacas.yacas <- function(x, ...) {
 
 as.Expr.formula <- function(x) as.expression(as.language(x[[length(x)]]))
 
-Eval <- function(x, env = parent.frame(), ...) UseMethod("Eval")
+Eval <- function(x, envir = parent.frame(), ...) UseMethod("Eval")
 
-Eval.yacas <- function(x, env = parent.frame(), ...) 
-	eval(x[[1]], env = env)
+Eval.yacas <- function(x, envir = parent.frame(), ...) 
+	eval(x[[1]], envir = envir)
 
 as.expression.yacas <- function(x, ...) x[[1]]
 as.character.yacas <- function(x, ...) as.character(x[[1]])

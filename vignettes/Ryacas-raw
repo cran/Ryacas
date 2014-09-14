@@ -1,6 +1,8 @@
 \documentclass[]{article} 
 
-\usepackage{inputenc,hyperref,a4,color,boxedminipage,Sweave}
+	
+\usepackage[utf8]{inputenc}
+\usepackage{hyperref,a4,color,boxedminipage,Sweave}
 %\VignetteIndexEntry{Introduction to Ryacas}
 %\VignettePackage{Ryacas}
 %\VignetteDepends{XML}
@@ -548,14 +550,8 @@ PrettyForm(B)
 The output can be displayed in TeX form:
 @ 
 <<>>=
-yacas("TeXForm(B)")
+yacas("TeXForm(B)", retclass = "character")
 @ %def 
-
-@ 
-<<>>=
-TeXForm(B)
-@ %def 
-
 
 \section{Commands} 
 \label{sec:commands}
@@ -566,6 +562,7 @@ TeXForm(B)
 @ 
 <<>>=
 yacas("40!")
+yacas("40!", retclass = "character")
 @ %def 
 
 @ 
@@ -629,7 +626,9 @@ Solve(List(xs^2+ys^2==6, xs-ys==3), List(xs,ys))
 @ %def
 
 <<>>=
-Solve(List(mean==(xs/(xs+ys)), variance==((xs*ys)/(((xs+ys)^2) * (xs+ys+1)))),
+mu <- Sym("mu") # mean
+v <- Sym("v") # variance
+Solve(List(mu==(xs/(xs+ys)), v==((xs*ys)/(((xs+ys)^2) * (xs+ys+1)))),
     List(xs,ys))
 @ %def
 

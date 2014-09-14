@@ -1,6 +1,8 @@
 \documentclass[]{article} 
 
-\usepackage{inputenc,hyperref,a4,color,boxedminipage,Sweave}
+	
+\usepackage[utf8]{inputenc}
+\usepackage{hyperref,a4,color,boxedminipage,Sweave}
 %\VignetteIndexEntry{Introduction to Ryacas}
 %\VignettePackage{Ryacas}
 %\VignetteDepends{XML}
@@ -23,7 +25,7 @@
   algebra system}
 \author{Rob Goedman, \and
 Gabor Grothendieck,  \and
-Søren Højsgaard,  \and
+S<f8>ren H<f8>jsgaard,  \and
 Ayal Pinkus}
 
 
@@ -79,7 +81,7 @@ involves valid R calls, symbols or constants (though not all valid \R\
 expressions are valid). For example:
 \begin{Schunk}
 \begin{Sinput}
-> exp1 <- yacas(expression(Factor(x^2 - 1)))
+> exp1<- yacas(expression(Factor(x^2-1)))
 \end{Sinput}
 \begin{Soutput}
 [1] "Starting Yacas!"
@@ -92,7 +94,7 @@ object of class \code{"yacas"}.
 To evaluate the resulting expression numerically, we can do
 \begin{Schunk}
 \begin{Sinput}
-> Eval(exp1, list(x = 4))
+> Eval(exp1, list(x=4))
 \end{Sinput}
 \begin{Soutput}
 [1] 15
@@ -132,7 +134,7 @@ The function \code{Sym(x)} coerces an object \code{x} to a \sym\ object by
 first coercing it to character and then changing its class to "Sym":
 \begin{Schunk}
 \begin{Sinput}
-> x <- Sym("x")
+> x<- Sym("x")
 \end{Sinput}
 \begin{Soutput}
 expression(x)
@@ -142,7 +144,7 @@ expression(x)
 Operations on \sym\ objects lead to new \sym\ objects:
 \begin{Schunk}
 \begin{Sinput}
-> x + 4
+> x+4
 \end{Sinput}
 \begin{Soutput}
 expression(x + 4)
@@ -165,7 +167,7 @@ It is important to note the difference between the \R\ name \code{x}
 and the symbol \code{"x"} as illustrated below:
 \begin{Schunk}
 \begin{Sinput}
-> x <- Sym("xs")
+> x<- Sym("xs")
 \end{Sinput}
 \begin{Soutput}
 expression(xs)
@@ -177,13 +179,13 @@ expression(xs)
 expression(xs)
 \end{Soutput}
 \begin{Sinput}
-> x + 4
+> x+4
 \end{Sinput}
 \begin{Soutput}
 expression(xs + 4)
 \end{Soutput}
 \begin{Sinput}
-> Eval(x + 4, list(xs = 5))
+> Eval(x+4, list(xs=5))
 \end{Sinput}
 \begin{Soutput}
 [1] 9
@@ -194,7 +196,7 @@ The convention in the following is 1) that \sym\ objects match with
 their names that they end with an 's', e.g.
 \begin{Schunk}
 \begin{Sinput}
-> xs <- Sym("xs")
+> xs <- Sym('xs')
 \end{Sinput}
 \end{Schunk}
 
@@ -211,7 +213,7 @@ Algebraic calculations:
 expression(823603)
 \end{Soutput}
 \begin{Sinput}
-> yacas(expression(1/14 + 5/21 * (30 - 1 + 1/2)))
+> yacas(expression(1/14+5/21* (30- 1+ 1/2)))
 \end{Sinput}
 \begin{Soutput}
 expression(149/21)
@@ -220,12 +222,15 @@ expression(149/21)
 
 \begin{Schunk}
 \begin{Sinput}
-> Sym("10 * 2") * 5 + Sym(7)^7
+> #(Sym(10) + Sym(2)) * Sym(5) + Sym(7) ^ Sym(7)
+> Sym("10 * 2") * 5 + Sym(7) ^ 7
 \end{Sinput}
 \begin{Soutput}
 expression(823643)
 \end{Soutput}
 \begin{Sinput}
+> #(Sym(10) + 2) * 5 + Sym(7) ^ 7
+> #Sym("(10+2)*5 + 7^7")
 > Sym("1/14 + 5/21 * (30 - 1+1/2)")
 \end{Sinput}
 \begin{Soutput}
@@ -250,13 +255,16 @@ expression(-6)
 \begin{Soutput}
 expression(-6)
 \end{Soutput}
+\begin{Sinput}
+> #Eval(Sym("-12/2"))
+\end{Sinput}
 \end{Schunk}
 
 
 Symbolic expressions:
 \begin{Schunk}
 \begin{Sinput}
-> yacas(expression(Factor(x^2 - 1)))
+> yacas(expression(Factor(x^2-1)))
 \end{Sinput}
 \begin{Soutput}
 expression((x + 1) * (x - 1))
@@ -265,7 +273,7 @@ expression((x + 1) * (x - 1))
 > exp1 <- expression(x^2 + 2 * x^2)
 > exp2 <- expression(2 * exp0)
 > exp3 <- expression(6 * pi * x)
-> exp4 <- expression((exp1 * (1 - sin(exp3)))/exp2)
+> exp4 <- expression((exp1 * (1 - sin(exp3))) / exp2)
 > yacas(exp4)
 \end{Sinput}
 \begin{Soutput}
@@ -275,7 +283,7 @@ expression(3 * x^2 * (1 - sin(6 * x * pi))/(2 * exp0))
 
 \begin{Schunk}
 \begin{Sinput}
-> Factor(xs^2 - 1)
+> Factor(xs^2-1)
 \end{Sinput}
 \begin{Soutput}
 expression((xs + 1) * (xs - 1))
@@ -285,7 +293,7 @@ expression((xs + 1) * (xs - 1))
 > exp0 <- Sym("exp0")
 > exp2 <- 2 * Sym(exp0)
 > exp3 <- 6 * Pi * xs
-> exp4 <- exp1 * (1 - sin(exp3))/exp2
+> exp4 <- exp1 * (1 - sin(exp3)) / exp2
 > exp4
 \end{Sinput}
 \begin{Soutput}
@@ -368,7 +376,7 @@ expression(x^3 + 3 * x^2 + 3 * x + 1)
 
 \begin{Schunk}
 \begin{Sinput}
-> Expand((1 + xs)^3)
+> Expand((1+xs)^3)
 \end{Sinput}
 \begin{Soutput}
 expression(xs^3 + 3 * xs^2 + 3 * xs + 1)
@@ -398,7 +406,7 @@ expression(xs + xs^2/2 + xs^3/6 + 1)
 Printing the result in nice forms:
 \begin{Schunk}
 \begin{Sinput}
-> yacas("PrettyForm(texp)")
+> yacas("PrettyForm(texp)") 
 \end{Sinput}
 \begin{Soutput}
      2    3    
@@ -416,7 +424,7 @@ $x + \frac{x ^{2}}{2}  + \frac{x ^{3}}{6}  + 1$
 
 \begin{Schunk}
 \begin{Sinput}
-> PrettyForm(texp)
+> PrettyForm(texp) 
 \end{Sinput}
 \begin{Soutput}
        2     3    
@@ -454,6 +462,10 @@ expression(60)
 \begin{Soutput}
 expression(120)
 \end{Soutput}
+\begin{Sinput}
+> #yacas("Set(z, Cos(a))")
+> #yacas("z+z")
+\end{Sinput}
 \end{Schunk}
 
 The same can be achieved with \sym\ objects: Consider:
@@ -479,7 +491,7 @@ Now the \R\ variable \code{ns} refers to the \yacas\ variable
 \code{ns} and we can make  calculations directly from \R, e.g:
 \begin{Schunk}
 \begin{Sinput}
-> Set(ns, 123)
+> Set(ns,123)
 \end{Sinput}
 \begin{Soutput}
 expression(123)
@@ -682,7 +694,7 @@ expression(2.66917293233083)
 
 \begin{Schunk}
 \begin{Sinput}
-> N("355/113", 20)
+> N("355/113",20) 
 \end{Sinput}
 \begin{Soutput}
 expression(3.14159292035398)
@@ -788,19 +800,19 @@ expression(-12/7)
 \begin{Sinput}
 > xs <- Sym("xs")
 > ys <- Sym("ys")
-> 0 + xs
+> 0+xs
 \end{Sinput}
 \begin{Soutput}
 expression(xs)
 \end{Soutput}
 \begin{Sinput}
-> xs + 1 * ys
+> xs+1*ys
 \end{Sinput}
 \begin{Soutput}
 expression(xs + ys)
 \end{Soutput}
 \begin{Sinput}
-> sin(asin(xs)) + tan(atan(ys))
+> sin(asin(xs))+tan(atan(ys))
 \end{Sinput}
 \begin{Soutput}
 expression(xs + ys)
@@ -846,19 +858,19 @@ expression(complex_cartesian(cos(3), sin(3)))
 expression(-1)
 \end{Soutput}
 \begin{Sinput}
-> 7 + 3 * I
+> 7+3*I
 \end{Sinput}
 \begin{Soutput}
 expression(complex_cartesian(7, 3))
 \end{Soutput}
 \begin{Sinput}
-> Conjugate(7 + 3 * I)
+> Conjugate(7+3*I)
 \end{Sinput}
 \begin{Soutput}
 expression(complex_cartesian(7, -3))
 \end{Soutput}
 \begin{Sinput}
-> exp(3 * I)
+> exp(3*I)
 \end{Sinput}
 \begin{Soutput}
 expression(complex_cartesian(cos(3), sin(3)))
@@ -893,7 +905,7 @@ expression((x + 1)^3)
 
 \begin{Schunk}
 \begin{Sinput}
-> (1 + x)^3
+> (1+x)^3
 \end{Sinput}
 \begin{Soutput}
 expression((xs + 1)^3)
@@ -947,13 +959,10 @@ expression((x + 1)^2 + k^3)
 
 \begin{Schunk}
 \begin{Sinput}
-> as <- Sym("as")
-> bs <- Sym("bs")
-> cs <- Sym("cs")
-> ds <- Sym("ds")
-> A <- List(List(as, bs), List(cs, ds))
+> as <- Sym("as"); bs <- Sym("bs"); cs <- Sym("cs"); ds <- Sym("ds")
+> A <- List(List(as,bs), List(cs,ds))
 > ks <- Sym("ks")
-> B <- (1 + xs)^2 + ks^3
+> B <- (1+xs)^2+ks^3
 > A
 \end{Sinput}
 \begin{Soutput}
@@ -1017,22 +1026,12 @@ The Pretty form is:
 The output can be displayed in TeX form:
 \begin{Schunk}
 \begin{Sinput}
-> yacas("TeXForm(B)")
+> yacas("TeXForm(B)", retclass = "character")
 \end{Sinput}
 \begin{Soutput}
-expression("$left( x + 1\right)  ^{2} + k ^{3}$")
+'$\left( x + 1\right)  ^{2} + k ^{3}$'
 \end{Soutput}
 \end{Schunk}
-
-\begin{Schunk}
-\begin{Sinput}
-> TeXForm(B)
-\end{Sinput}
-\begin{Soutput}
-expression("$left( xs + 1\right)  ^{2} + ks ^{3}$")
-\end{Soutput}
-\end{Schunk}
-
 
 \section{Commands} 
 \label{sec:commands}
@@ -1047,6 +1046,12 @@ expression("$left( xs + 1\right)  ^{2} + ks ^{3}$")
 \begin{Soutput}
 expression(8.15915283247898e+47)
 \end{Soutput}
+\begin{Sinput}
+> yacas("40!", retclass = "character")
+\end{Sinput}
+\begin{Soutput}
+815915283247897734345611269596115894272000000000 
+\end{Soutput}
 \end{Schunk}
 
 \begin{Schunk}
@@ -1054,7 +1059,7 @@ expression(8.15915283247898e+47)
 > Factorial(40)
 \end{Sinput}
 \begin{Soutput}
-expression(Factorial(40))
+expression(8.15915283247898e+47)
 \end{Soutput}
 \end{Schunk}
 
@@ -1081,14 +1086,14 @@ expression(exp(a) + exp(a) * (x - a) + (x - a)^2 * exp(a)/2 +
 \begin{Schunk}
 \begin{Sinput}
 > xs <- Sym("xs")
-> Taylor(exp(xs), xs, 0, 3)
+> Taylor(exp(xs),xs,0,3)
 \end{Sinput}
 \begin{Soutput}
 expression(xs + xs^2/2 + xs^3/6 + 1)
 \end{Soutput}
 \begin{Sinput}
 > as <- Sym("as")
-> Taylor(exp(x), x, as, 3)
+> Taylor(exp(x),x,as,3)
 \end{Sinput}
 \begin{Soutput}
 expression(exp(as) + exp(as) * (xs - as) + (xs - as)^2 * exp(as)/2 + 
@@ -1117,13 +1122,13 @@ expression(y - 1 - (y - 1)^2/2)
 
 \begin{Schunk}
 \begin{Sinput}
-> InverseTaylor(exp(xs), xs, 0, 2)
+> InverseTaylor(exp(xs),xs,0,2)
 \end{Sinput}
 \begin{Soutput}
 expression(xs + xs^2/2 + 1)
 \end{Soutput}
 \begin{Sinput}
-> Taylor(log(ys), ys, 1, 2)
+> Taylor(log(ys),ys,1,2)
 \end{Sinput}
 \begin{Soutput}
 expression(ys - 1 - (ys - 1)^2/2)
@@ -1153,16 +1158,38 @@ expression(list(x == 0, x == -1))
 
 \begin{Schunk}
 \begin{Sinput}
-> Solve(xs/(1 + xs) == as, xs)
+> Solve(xs/(1+xs) == as, xs)
 \end{Sinput}
 \begin{Soutput}
 expression(list(xs == as/(1 - as)))
 \end{Soutput}
 \begin{Sinput}
-> Solve(xs^2 + xs == 0, xs)
+> Solve(xs^2+xs == 0, xs)
 \end{Sinput}
 \begin{Soutput}
 expression(list(xs == 0, xs == -1))
+\end{Soutput}
+\end{Schunk}
+
+\begin{Schunk}
+\begin{Sinput}
+> Solve(List(xs^2+ys^2==6, xs-ys==3), List(xs,ys))
+\end{Sinput}
+\begin{Soutput}
+expression(list(list(xs == root(6 - ys^2, 2), ys == ys)))
+\end{Soutput}
+\end{Schunk}
+
+\begin{Schunk}
+\begin{Sinput}
+> mu <- Sym("mu") # mean
+> v <- Sym("v") # variance
+> Solve(List(mu==(xs/(xs+ys)), v==((xs*ys)/(((xs+ys)^2) * (xs+ys+1)))),
++     List(xs,ys))
+\end{Sinput}
+\begin{Soutput}
+expression(list(list(xs == mu^2 * (1 - mu)/v - mu, ys == xs/mu - 
+    xs)))
 \end{Soutput}
 \end{Schunk}
 
@@ -1183,7 +1210,7 @@ expression(-3.18306)
 
 \begin{Schunk}
 \begin{Sinput}
-> Newton(sin(xs) - exp(xs), xs, 0.5, 1e-04)
+> Newton(sin(xs)-exp(xs),xs, 0.5, 0.0001) 
 \end{Sinput}
 \begin{Soutput}
 expression(-3.18306)
@@ -1193,7 +1220,7 @@ expression(-3.18306)
 \subsection{Expanding polynomials} 
 \begin{Schunk}
 \begin{Sinput}
-> yacas(expression(Expand((1 + x)^3)))
+> yacas(expression(Expand((1+x)^3)))
 \end{Sinput}
 \begin{Soutput}
 expression(x^3 + 3 * x^2 + 3 * x + 1)
@@ -1202,7 +1229,7 @@ expression(x^3 + 3 * x^2 + 3 * x + 1)
 
 \begin{Schunk}
 \begin{Sinput}
-> Expand((x + 1)^3)
+> Expand((x+1)^3)
 \end{Sinput}
 \begin{Soutput}
 expression(xs^3 + 3 * xs^2 + 3 * xs + 1)
@@ -1229,11 +1256,14 @@ expression((x + y)^3 - (x - y)^3)
 \begin{Soutput}
 expression(6 * (x^2 * y) + 2 * y^3)
 \end{Soutput}
+\begin{Sinput}
+> 
+\end{Sinput}
 \end{Schunk}
 
 \begin{Schunk}
 \begin{Sinput}
-> (x + y)^3 - (x - y)^3
+> (x+y)^3-(x-y)^3
 \end{Sinput}
 \begin{Soutput}
 expression((xs + y)^3 - (xs - y)^3)
@@ -1282,7 +1312,7 @@ expression(sin(x))
 
 \begin{Schunk}
 \begin{Sinput}
-> deriv(sin(xs), xs, 4)
+> deriv(sin(xs),xs,4)
 \end{Sinput}
 \begin{Soutput}
 expression(sin(xs))
@@ -1294,6 +1324,9 @@ expression(sin(xs))
 
 \begin{Schunk}
 \begin{Sinput}
+> #yacas("Integrate(x,a,b)Sin(x)")
+> #yacas("Integrate(x,a,b)Ln(x)+x")
+> #yacas("Integrate(x)1/(x^2-1)")
 > yacas("Integrate(x)Sin(a*x)^2*Cos(b*x)")
 \end{Sinput}
 \begin{Soutput}
@@ -1304,9 +1337,12 @@ expression((2 * sin(b * x)/b - (sin(-2 * x * a - b * x)/(-2 *
 
 \begin{Schunk}
 \begin{Sinput}
+> #Integrate(sin(x),x,a,b)
+> #Integrate(log(x),x,a,b)
+> #Integrate(1/(x^2-1),x)
 > a <- Sym("a")
 > b <- Sym("b")
-> Integrate(sin(a * x)^2 * cos(b * x), x)
+> Integrate(sin(a*x)^2*cos(b*x),x)
 \end{Sinput}
 \begin{Soutput}
 expression((2 * sin(b * xs)/b - (sin(-2 * xs * a - b * xs)/(-2 * 
@@ -1318,6 +1354,7 @@ expression((2 * sin(b * xs)/b - (sin(-2 * xs * a - b * xs)/(-2 *
 \subsection{Limits}
 \begin{Schunk}
 \begin{Sinput}
+> #yacas("Limit(x,0)Sin(x)/x")
 > yacas("Limit(n,Infinity)(1+(1/n))^n")
 \end{Sinput}
 \begin{Soutput}
@@ -1333,15 +1370,16 @@ expression(cos(x))
 
 \begin{Schunk}
 \begin{Sinput}
+> #Limit(sin(x)/x,x,0)
 > ns <- Sym("ns")
-> Limit((1 + (1/ns))^ns, ns, Infinity)
+> Limit((1+(1/ns))^ns,ns,Infinity)
 \end{Sinput}
 \begin{Soutput}
 expression(exp(1))
 \end{Soutput}
 \begin{Sinput}
 > hs <- Sym("hs")
-> Limit((sin(xs + hs) - sin(xs))/hs, hs, 0)
+> Limit((sin(xs+hs)-sin(xs))/hs,hs,0)
 \end{Sinput}
 \begin{Soutput}
 expression(cos(xs))
@@ -1361,7 +1399,7 @@ expression(2 * cos(a))
 
 \begin{Schunk}
 \begin{Sinput}
-> Subst(xs + xs, xs, cos(as))
+> Subst(xs+xs,xs,cos(as))
 \end{Sinput}
 \begin{Soutput}
 expression(2 * cos(as))
@@ -1375,13 +1413,13 @@ expression(2 * cos(as))
 > yacas("OdeSolve(y''==4*y)")
 \end{Sinput}
 \begin{Soutput}
-expression(C345 * exp(2 * x) + C349 * exp(-2 * x))
+expression(C1586 * exp(2 * x) + C1590 * exp(-2 * x))
 \end{Soutput}
 \begin{Sinput}
 > yacas("OdeSolve(y'==8*y)")
 \end{Sinput}
 \begin{Soutput}
-expression(C379 * exp(8 * x))
+expression(C1620 * exp(8 * x))
 \end{Soutput}
 \end{Schunk}
 
@@ -1576,13 +1614,13 @@ expression(-1/(u1 * u2^2))
 Note that the value returned by \yacas\ can be of different types:
 \begin{Schunk}
 \begin{Sinput}
-> yacas(expression(Factor(x^2 - 1)), retclass = "unquote")
+> yacas(expression(Factor(x^2-1)),retclass='unquote')
 \end{Sinput}
 \begin{Soutput}
 *" ("+" (x ,1 ),"- (x ,1 ))
 \end{Soutput}
 \begin{Sinput}
-> yacas(expression(Factor(x^2 - 1)), retclass = "character")
+> yacas(expression(Factor(x^2-1)),retclass='character')
 \end{Sinput}
 \begin{Soutput}
 "*" ("+" (x ,1 ),"-" (x ,1 ))

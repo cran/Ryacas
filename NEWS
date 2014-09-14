@@ -1,3 +1,11 @@
+Changes in version 0.2-12.1
+
+o modifications needed for R 3.1.1
+
+o internally, the socket connection is now stored in yacCon in the internal
+  environment .RyacasEnv.  (Previously it was called .yacCon and stored in the
+  global environment.)  See the internals section of ?yacas for more info.
+
 Changes in version 0.2-11
 
 o modifications needed to work in R 2.14

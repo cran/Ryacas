@@ -143,6 +143,13 @@ sin(x)\tab Sin(x)\cr
 deriv(sin, x)\tab Deriv(x)Sin(x)\cr
 log(x)\tab Ln(x)\cr
 }
+
+Internals. An internal environment, \code{.RyacasEnv}, contains the
+connections object, \code{yacCon}, which contains information on the
+socket connection to yacas itself.  \code{yacCon} is created by 
+\code{yacasStart()} and destroyed by \code{yacasStop()}.  \code{yacasStart()}
+is automatically called the first time a yacas computation is required and
+\code{yacasStop()} is called when the Ryacas package is detached.
 }
 
 \keyword{ symbolmath }
