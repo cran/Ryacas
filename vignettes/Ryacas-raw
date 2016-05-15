@@ -1,7 +1,7 @@
 \documentclass[]{article} 
 
-	
 \usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
 \usepackage{hyperref,a4,color,boxedminipage,Sweave}
 %\VignetteIndexEntry{Introduction to Ryacas}
 %\VignettePackage{Ryacas}
@@ -25,7 +25,7 @@
   algebra system}
 \author{Rob Goedman, \and
 Gabor Grothendieck,  \and
-Søren Højsgaard,  \and
+SÃ¸ren HÃ¸jsgaard,  \and
 Ayal Pinkus}
 
 
@@ -550,8 +550,14 @@ PrettyForm(B)
 The output can be displayed in TeX form:
 @ 
 <<>>=
-yacas("TeXForm(B)", retclass = "character")
+yacas("TeXForm(B)")
 @ %def 
+
+@ 
+<<>>=
+TeXForm(B)
+@ %def 
+
 
 \section{Commands} 
 \label{sec:commands}
@@ -562,7 +568,6 @@ yacas("TeXForm(B)", retclass = "character")
 @ 
 <<>>=
 yacas("40!")
-yacas("40!", retclass = "character")
 @ %def 
 
 @ 
@@ -626,9 +631,7 @@ Solve(List(xs^2+ys^2==6, xs-ys==3), List(xs,ys))
 @ %def
 
 <<>>=
-mu <- Sym("mu") # mean
-v <- Sym("v") # variance
-Solve(List(mu==(xs/(xs+ys)), v==((xs*ys)/(((xs+ys)^2) * (xs+ys+1)))),
+Solve(List(mean==(xs/(xs+ys)), variance==((xs*ys)/(((xs+ys)^2) * (xs+ys+1)))),
     List(xs,ys))
 @ %def
 
