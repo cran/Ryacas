@@ -5,6 +5,16 @@
 
 using namespace Rcpp;
 
+// yacas_init_force
+void yacas_init_force(std::string path);
+RcppExport SEXP _Ryacas_yacas_init_force(SEXP pathSEXP) {
+BEGIN_RCPP
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< std::string >::type path(pathSEXP);
+    yacas_init_force(path);
+    return R_NilValue;
+END_RCPP
+}
 // yacas_evaluate
 std::vector<std::string> yacas_evaluate(std::string expr);
 RcppExport SEXP _Ryacas_yacas_evaluate(SEXP exprSEXP) {
@@ -18,6 +28,7 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
+    {"_Ryacas_yacas_init_force", (DL_FUNC) &_Ryacas_yacas_init_force, 1},
     {"_Ryacas_yacas_evaluate", (DL_FUNC) &_Ryacas_yacas_evaluate, 1},
     {NULL, NULL, 0}
 };
