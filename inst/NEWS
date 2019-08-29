@@ -1,3 +1,17 @@
+Changes in version 1.0.0
+
+o A WHOLE NEW INTERFACE - READ "GETTING STARTED" VIGNETTE.
+  Old functions throw a warning, and will be removed in the next version. 
+  A legacy package Ryacas0 is available: https://github.com/mikldk/ryacas0/ .
+o Yacas errors are now provided to the user instead of just an empty result.
+o Vignette on making exercises via the exams package.
+o Updated Yacas to 1.7.1 (check with yac_str("Version()")).
+  (std::string_view replaced by std::string to use C++11 instead of C++17)
+    - Actually, all the way to commit 49b5211 
+      (https://github.com/grzegorzmazur/yacas/commit/49b5211).
+o Added custom Ryacas Yacas initialization in inst/yacas-custom/ryacasinit.ys 
+  for future use, e.g. for additional definitions of Sum()'s.
+
 Changes in version 0.4.1
 
 o TeXForm() now returns character vector (without $'s at the beginning and end)

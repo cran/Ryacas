@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<meta name="author" content="Mikkel Meyer Andersen and Søren Højsgaard" />
+
+<meta name="date" content="2019-08-29" />
+
+<title>Arbitrary-precision arithmetic</title>
+
+
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css" data-origin="pandoc">
+a.sourceLine { display: inline-block; line-height: 1.25; }
+a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
+a.sourceLine:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+a.sourceLine { text-indent: -1em; padding-left: 1em; }
+}
+pre.numberSource a.sourceLine
+  { position: relative; left: -4em; }
+pre.numberSource a.sourceLine::before
+  { content: attr(title);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; pointer-events: all; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {  }
+@media screen {
+a.sourceLine::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    for (var j = 0; j < rules.length; j++) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") continue;
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') continue;
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#header {
+text-align: center;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">Arbitrary-precision arithmetic</h1>
+<h4 class="author">Mikkel Meyer Andersen and Søren Højsgaard</h4>
+<h4 class="date">2019-08-29</h4>
+
+
+
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" title="1"><span class="kw">library</span>(Ryacas)</a></code></pre></div>
+<p>In <code>R</code>, the package <code>Rmpfr</code> package provide some functions for arbitrary-precision arithmetic. The way it is done is to allow for using more memory for storing numbers. This is very good for some use-cases, e.g. the example in <code>Rmpfr</code>’s a vignette “Accurately Computing <span class="math inline">\(\log(1 - \exp(-|a|))\)</span>”.</p>
+<p>Here, we demonstrate how to do investigate other aspects of arbitrary-precision arithmetic using <code>Ryacas</code>, e.g. solving systems of linear equations and matrix inverses.</p>
+<div id="arbitrary-precision-arithmetic" class="section level1">
+<h1>Arbitrary-precision arithmetic</h1>
+<p>First see the problem when using floating-point arithmetic:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" title="1">(<span class="fl">0.3</span> <span class="op">-</span><span class="st"> </span><span class="fl">0.2</span>) <span class="op">-</span><span class="st"> </span><span class="fl">0.1</span></a></code></pre></div>
+<pre><code>## [1] -2.775558e-17</code></pre>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" title="1"><span class="kw">yac_str</span>(<span class="st">&quot;(0.3 - 0.2) - 0.1&quot;</span>) <span class="co"># decimal number does not </span></a></code></pre></div>
+<pre><code>## [1] &quot;0&quot;</code></pre>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" title="1">                             <span class="co"># always work well; often </span></a>
+<a class="sourceLine" id="cb6-2" title="2">                             <span class="co"># it is better to represent as </span></a>
+<a class="sourceLine" id="cb6-3" title="3">                             <span class="co"># rational number if possible</span></a>
+<a class="sourceLine" id="cb6-4" title="4"></a>
+<a class="sourceLine" id="cb6-5" title="5"><span class="co"># (1/3 - 1/5) = 5/15 - 3/15 = 2/15</span></a>
+<a class="sourceLine" id="cb6-6" title="6">(<span class="dv">1</span><span class="op">/</span><span class="dv">3</span> <span class="op">-</span><span class="st"> </span><span class="dv">1</span><span class="op">/</span><span class="dv">5</span>) <span class="op">-</span><span class="st"> </span><span class="dv">2</span><span class="op">/</span><span class="dv">15</span></a></code></pre></div>
+<pre><code>## [1] -2.775558e-17</code></pre>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" title="1"><span class="kw">yac_str</span>(<span class="st">&quot;(1/3 - 1/5) - 2/15&quot;</span>)</a></code></pre></div>
+<pre><code>## [1] &quot;0&quot;</code></pre>
+<p>The <code>yacas</code> function <a href="https://yacas.readthedocs.io/en/latest/reference_manual/arithmetic.html#N"><code>N()</code></a> gives the numeric (floating-point) value for a precision.</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb10-1" title="1"><span class="kw">yac_str</span>(<span class="st">&quot;1/3&quot;</span>)</a></code></pre></div>
+<pre><code>## [1] &quot;1/3&quot;</code></pre>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb12-1" title="1"><span class="kw">yac_str</span>(<span class="st">&quot;N(1/3)&quot;</span>)</a></code></pre></div>
+<pre><code>## [1] &quot;0.3333333333&quot;</code></pre>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb14-1" title="1"><span class="kw">yac_str</span>(<span class="st">&quot;N(1/3, 1)&quot;</span>)</a></code></pre></div>
+<pre><code>## [1] &quot;0.3&quot;</code></pre>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb16-1" title="1"><span class="kw">yac_str</span>(<span class="st">&quot;N(1/3, 200)&quot;</span>)</a></code></pre></div>
+<pre><code>## [1] &quot;0.33333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333&quot;</code></pre>
+</div>
+<div id="evaluating-polynomials" class="section level1">
+<h1>Evaluating polynomials</h1>
+<p>Consider the polynomial <span class="math inline">\((x-1)^7\)</span> with root 1 (with multiplicity 7). We can consider it both in factorised form and in expanded form:</p>
+<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb18-1" title="1">pol &lt;-<span class="st"> &quot;(x-1)^7&quot;</span></a>
+<a class="sourceLine" id="cb18-2" title="2">p1 &lt;-<span class="st"> </span>pol <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">yac_expr</span>()</a>
+<a class="sourceLine" id="cb18-3" title="3">p1</a></code></pre></div>
+<pre><code>## expression((x - 1)^7)</code></pre>
+<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb20-1" title="1">p2 &lt;-<span class="st"> </span>pol <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">y_fn</span>(<span class="st">&quot;Expand&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">yac_expr</span>()</a>
+<a class="sourceLine" id="cb20-2" title="2">p2</a></code></pre></div>
+<pre><code>## expression(x^7 - 7 * x^6 + 21 * x^5 - 35 * x^4 + 35 * x^3 - 21 * 
+##     x^2 + 7 * x - 1)</code></pre>
+<p>Mathematically, these are the same objects, but when it comes to numerical computations, the picture is different:</p>
+<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb22-1" title="1"><span class="kw">eval</span>(p1, <span class="kw">list</span>(<span class="dt">x =</span> <span class="fl">1.001</span>))</a></code></pre></div>
+<pre><code>## [1] 1e-21</code></pre>
+<div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb24-1" title="1"><span class="kw">eval</span>(p2, <span class="kw">list</span>(<span class="dt">x =</span> <span class="fl">1.001</span>))</a></code></pre></div>
+<pre><code>## [1] 8.881784e-15</code></pre>
+<p>We can of course also evaluate the polynomials in the different forms in <code>yacas</code> using <a href="https://yacas.readthedocs.io/en/latest/reference_manual/controlflow.html#WithValue"><code>WithValue()</code></a>:</p>
+<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb26-1" title="1"><span class="co"># First try with 1.001:</span></a>
+<a class="sourceLine" id="cb26-2" title="2">pol_val &lt;-<span class="st"> </span><span class="kw">paste0</span>(<span class="st">&quot;WithValue(x, 1.001, &quot;</span>, pol, <span class="st">&quot;)&quot;</span>)</a>
+<a class="sourceLine" id="cb26-3" title="3">pol_val</a></code></pre></div>
+<pre><code>## [1] &quot;WithValue(x, 1.001, (x-1)^7)&quot;</code></pre>
+<div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb28-1" title="1"><span class="kw">yac_str</span>(pol_val)</a></code></pre></div>
+<pre><code>## [1] &quot;0&quot;</code></pre>
+<div class="sourceCode" id="cb30"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb30-1" title="1"><span class="co">#... to get result symbolically, use instead the number as a fraction</span></a>
+<a class="sourceLine" id="cb30-2" title="2">pol_val &lt;-<span class="st"> </span><span class="kw">paste0</span>(<span class="st">&quot;WithValue(x, 1001/1000, &quot;</span>, pol, <span class="st">&quot;)&quot;</span>)</a>
+<a class="sourceLine" id="cb30-3" title="3">pol_val</a></code></pre></div>
+<pre><code>## [1] &quot;WithValue(x, 1001/1000, (x-1)^7)&quot;</code></pre>
+<div class="sourceCode" id="cb32"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb32-1" title="1"><span class="kw">yac_str</span>(pol_val)</a></code></pre></div>
+<pre><code>## [1] &quot;1/1000000000000000000000&quot;</code></pre>
+<div class="sourceCode" id="cb34"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb34-1" title="1">pol_val <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">y_fn</span>(<span class="st">&quot;Denom&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">yac_str</span>()</a></code></pre></div>
+<pre><code>## [1] &quot;1000000000000000000000&quot;</code></pre>
+<div class="sourceCode" id="cb36"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb36-1" title="1">pol_val <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">y_fn</span>(<span class="st">&quot;Denom&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">y_fn</span>(<span class="st">&quot;IntLog&quot;</span>, <span class="st">&quot;10&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">yac_str</span>()</a></code></pre></div>
+<pre><code>## [1] &quot;21&quot;</code></pre>
+<div class="sourceCode" id="cb38"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb38-1" title="1">pol_val &lt;-<span class="st"> </span><span class="kw">paste0</span>(<span class="st">&quot;WithValue(x, 1001/1000, Expand(&quot;</span>, pol, <span class="st">&quot;))&quot;</span>)</a>
+<a class="sourceLine" id="cb38-2" title="2">pol_val</a></code></pre></div>
+<pre><code>## [1] &quot;WithValue(x, 1001/1000, Expand((x-1)^7))&quot;</code></pre>
+<div class="sourceCode" id="cb40"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb40-1" title="1"><span class="kw">yac_str</span>(pol_val)</a></code></pre></div>
+<pre><code>## [1] &quot;1/1000000000000000000000&quot;</code></pre>
+<p>The reason for the difference is the near cancellation problem when using floating-point representation: Subtraction of nearly identical quantities. This phenomenon is illustrated in the plot below.</p>
+<div class="figure">
+<img src="data:image/png;base64,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" alt="solid line: (x-1)^7; dashed line: factorization of (x-1)^7." />
+<p class="caption">solid line: <span class="math inline">\((x-1)^7\)</span>; dashed line: factorization of <span class="math inline">\((x-1)^7\)</span>.</p>
+</div>
+<p>This example could of course have been illustrated directly in <code>R</code> but it is convenient that <code>Ryacas</code> provides expansion of polynomials directly so that students can experiment with other polynomials themselves.</p>
+</div>
+<div id="inverse-of-hilbert-matrix" class="section level1">
+<h1>Inverse of Hilbert matrix</h1>
+<p>In <code>R</code>’s <code>solve()</code> help file the <a href="https://en.wikipedia.org/wiki/Hilbert_matrix">Hilbert matrix</a> is introduced:</p>
+<div class="sourceCode" id="cb42"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb42-1" title="1">hilbert &lt;-<span class="st"> </span><span class="cf">function</span>(n) { </a>
+<a class="sourceLine" id="cb42-2" title="2">  i &lt;-<span class="st"> </span><span class="dv">1</span><span class="op">:</span>n</a>
+<a class="sourceLine" id="cb42-3" title="3">  H &lt;-<span class="st"> </span><span class="dv">1</span> <span class="op">/</span><span class="st"> </span><span class="kw">outer</span>(i <span class="op">-</span><span class="st"> </span><span class="dv">1</span>, i, <span class="st">&quot;+&quot;</span>)</a>
+<a class="sourceLine" id="cb42-4" title="4">  <span class="kw">return</span>(H)</a>
+<a class="sourceLine" id="cb42-5" title="5">}</a></code></pre></div>
+<p>We will now demonstrate the known fact that it is ill-conditioned (meaning e.g. that it is difficult to determine its inverse numerically).</p>
+<p>First we make the Hilbert matrix symbolically:</p>
+<div class="sourceCode" id="cb43"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb43-1" title="1">hilbert_sym &lt;-<span class="st"> </span><span class="cf">function</span>(n) { </a>
+<a class="sourceLine" id="cb43-2" title="2">  mat &lt;-<span class="st"> </span><span class="kw">matrix</span>(<span class="st">&quot;&quot;</span>, <span class="dt">nrow =</span> n, <span class="dt">ncol =</span> n)</a>
+<a class="sourceLine" id="cb43-3" title="3">  </a>
+<a class="sourceLine" id="cb43-4" title="4">  <span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span>n) {</a>
+<a class="sourceLine" id="cb43-5" title="5">    <span class="cf">for</span> (j <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span>n) {</a>
+<a class="sourceLine" id="cb43-6" title="6">      mat[i, j] &lt;-<span class="st"> </span><span class="kw">paste0</span>(<span class="st">&quot;1 / (&quot;</span>, (i<span class="dv">-1</span>), <span class="st">&quot; + &quot;</span>, j, <span class="st">&quot;)&quot;</span>)</a>
+<a class="sourceLine" id="cb43-7" title="7">    }</a>
+<a class="sourceLine" id="cb43-8" title="8">  }</a>
+<a class="sourceLine" id="cb43-9" title="9">  </a>
+<a class="sourceLine" id="cb43-10" title="10">  <span class="kw">return</span>(mat)</a>
+<a class="sourceLine" id="cb43-11" title="11">}</a></code></pre></div>
+<div class="sourceCode" id="cb44"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb44-1" title="1">A &lt;-<span class="st"> </span><span class="kw">hilbert</span>(<span class="dv">8</span>)</a>
+<a class="sourceLine" id="cb44-2" title="2">A</a></code></pre></div>
+<pre><code>##           [,1]      [,2]      [,3]       [,4]       [,5]       [,6]
+## [1,] 1.0000000 0.5000000 0.3333333 0.25000000 0.20000000 0.16666667
+## [2,] 0.5000000 0.3333333 0.2500000 0.20000000 0.16666667 0.14285714
+## [3,] 0.3333333 0.2500000 0.2000000 0.16666667 0.14285714 0.12500000
+## [4,] 0.2500000 0.2000000 0.1666667 0.14285714 0.12500000 0.11111111
+## [5,] 0.2000000 0.1666667 0.1428571 0.12500000 0.11111111 0.10000000
+## [6,] 0.1666667 0.1428571 0.1250000 0.11111111 0.10000000 0.09090909
+## [7,] 0.1428571 0.1250000 0.1111111 0.10000000 0.09090909 0.08333333
+## [8,] 0.1250000 0.1111111 0.1000000 0.09090909 0.08333333 0.07692308
+##            [,7]       [,8]
+## [1,] 0.14285714 0.12500000
+## [2,] 0.12500000 0.11111111
+## [3,] 0.11111111 0.10000000
+## [4,] 0.10000000 0.09090909
+## [5,] 0.09090909 0.08333333
+## [6,] 0.08333333 0.07692308
+## [7,] 0.07692308 0.07142857
+## [8,] 0.07142857 0.06666667</code></pre>
+<div class="sourceCode" id="cb46"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb46-1" title="1">B1 &lt;-<span class="st"> </span><span class="kw">hilbert_sym</span>(<span class="dv">8</span>)</a>
+<a class="sourceLine" id="cb46-2" title="2">B1</a></code></pre></div>
+<pre><code>##      [,1]          [,2]          [,3]          [,4]          [,5]         
+## [1,] &quot;1 / (0 + 1)&quot; &quot;1 / (0 + 2)&quot; &quot;1 / (0 + 3)&quot; &quot;1 / (0 + 4)&quot; &quot;1 / (0 + 5)&quot;
+## [2,] &quot;1 / (1 + 1)&quot; &quot;1 / (1 + 2)&quot; &quot;1 / (1 + 3)&quot; &quot;1 / (1 + 4)&quot; &quot;1 / (1 + 5)&quot;
+## [3,] &quot;1 / (2 + 1)&quot; &quot;1 / (2 + 2)&quot; &quot;1 / (2 + 3)&quot; &quot;1 / (2 + 4)&quot; &quot;1 / (2 + 5)&quot;
+## [4,] &quot;1 / (3 + 1)&quot; &quot;1 / (3 + 2)&quot; &quot;1 / (3 + 3)&quot; &quot;1 / (3 + 4)&quot; &quot;1 / (3 + 5)&quot;
+## [5,] &quot;1 / (4 + 1)&quot; &quot;1 / (4 + 2)&quot; &quot;1 / (4 + 3)&quot; &quot;1 / (4 + 4)&quot; &quot;1 / (4 + 5)&quot;
+## [6,] &quot;1 / (5 + 1)&quot; &quot;1 / (5 + 2)&quot; &quot;1 / (5 + 3)&quot; &quot;1 / (5 + 4)&quot; &quot;1 / (5 + 5)&quot;
+## [7,] &quot;1 / (6 + 1)&quot; &quot;1 / (6 + 2)&quot; &quot;1 / (6 + 3)&quot; &quot;1 / (6 + 4)&quot; &quot;1 / (6 + 5)&quot;
+## [8,] &quot;1 / (7 + 1)&quot; &quot;1 / (7 + 2)&quot; &quot;1 / (7 + 3)&quot; &quot;1 / (7 + 4)&quot; &quot;1 / (7 + 5)&quot;
+##      [,6]          [,7]          [,8]         
+## [1,] &quot;1 / (0 + 6)&quot; &quot;1 / (0 + 7)&quot; &quot;1 / (0 + 8)&quot;
+## [2,] &quot;1 / (1 + 6)&quot; &quot;1 / (1 + 7)&quot; &quot;1 / (1 + 8)&quot;
+## [3,] &quot;1 / (2 + 6)&quot; &quot;1 / (2 + 7)&quot; &quot;1 / (2 + 8)&quot;
+## [4,] &quot;1 / (3 + 6)&quot; &quot;1 / (3 + 7)&quot; &quot;1 / (3 + 8)&quot;
+## [5,] &quot;1 / (4 + 6)&quot; &quot;1 / (4 + 7)&quot; &quot;1 / (4 + 8)&quot;
+## [6,] &quot;1 / (5 + 6)&quot; &quot;1 / (5 + 7)&quot; &quot;1 / (5 + 8)&quot;
+## [7,] &quot;1 / (6 + 6)&quot; &quot;1 / (6 + 7)&quot; &quot;1 / (6 + 8)&quot;
+## [8,] &quot;1 / (7 + 6)&quot; &quot;1 / (7 + 7)&quot; &quot;1 / (7 + 8)&quot;</code></pre>
+<div class="sourceCode" id="cb48"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb48-1" title="1">B &lt;-<span class="st"> </span><span class="kw">yac_symbol</span>(B1) <span class="co"># convert to yacas symbol</span></a>
+<a class="sourceLine" id="cb48-2" title="2">B</a></code></pre></div>
+<pre><code>## {{   1,  1/2,  1/3,  1/4,  1/5,  1/6,  1/7,  1/8},
+##  { 1/2,  1/3,  1/4,  1/5,  1/6,  1/7,  1/8,  1/9},
+##  { 1/3,  1/4,  1/5,  1/6,  1/7,  1/8,  1/9, 1/10},
+##  { 1/4,  1/5,  1/6,  1/7,  1/8,  1/9, 1/10, 1/11},
+##  { 1/5,  1/6,  1/7,  1/8,  1/9, 1/10, 1/11, 1/12},
+##  { 1/6,  1/7,  1/8,  1/9, 1/10, 1/11, 1/12, 1/13},
+##  { 1/7,  1/8,  1/9, 1/10, 1/11, 1/12, 1/13, 1/14},
+##  { 1/8,  1/9, 1/10, 1/11, 1/12, 1/13, 1/14, 1/15}}</code></pre>
+<div class="sourceCode" id="cb50"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb50-1" title="1">Ainv &lt;-<span class="st"> </span><span class="kw">solve</span>(A)</a>
+<a class="sourceLine" id="cb50-2" title="2">Ainv</a></code></pre></div>
+<pre><code>##         [,1]      [,2]       [,3]       [,4]        [,5]        [,6]
+## [1,]      64     -2016      20160     -92400      221760     -288288
+## [2,]   -2016     84672    -952560    4656960   -11642400    15567552
+## [3,]   20160   -952560   11430720  -58212000   149688000  -204324119
+## [4,]  -92400   4656960  -58212000  304919999  -800414996  1109908794
+## [5,]  221760 -11642400  149688000 -800414996  2134439987 -2996753738
+## [6,] -288288  15567552 -204324119 1109908793 -2996753738  4249941661
+## [7,]  192192 -10594584  141261119 -776936154  2118916782 -3030050996
+## [8,]  -51480   2882880  -38918880  216215998  -594593995   856215351
+##             [,7]       [,8]
+## [1,]      192192     -51480
+## [2,]   -10594584    2882880
+## [3,]   141261119  -38918880
+## [4,]  -776936155  216215998
+## [5,]  2118916783 -594593995
+## [6,] -3030050996  856215352
+## [7,]  2175421226 -618377753
+## [8,]  -618377753  176679358</code></pre>
+<div class="sourceCode" id="cb52"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb52-1" title="1">Binv1 &lt;-<span class="st"> </span><span class="kw">solve</span>(B) <span class="co"># result is still yacas symbol</span></a>
+<a class="sourceLine" id="cb52-2" title="2">Binv1</a></code></pre></div>
+<pre><code>## {{         64,       -2016,       20160,      -92400,      221760,     -288288,      192192,      -51480},
+##  {      -2016,       84672,     -952560,     4656960,   -11642400,    15567552,   -10594584,     2882880},
+##  {      20160,     -952560,    11430720,   -58212000,   149688000,  -204324120,   141261120,   -38918880},
+##  {     -92400,     4656960,   -58212000,   304920000,  -800415000,  1109908800,  -776936160,   216216000},
+##  {     221760,   -11642400,   149688000,  -800415000,  2134440000, -2996753760,  2118916800,  -594594000},
+##  {    -288288,    15567552,  -204324120,  1109908800, -2996753760,  4249941696, -3030051024,   856215360},
+##  {     192192,   -10594584,   141261120,  -776936160,  2118916800, -3030051024,  2175421248,  -618377760},
+##  {     -51480,     2882880,   -38918880,   216216000,  -594594000,   856215360,  -618377760,   176679360}}</code></pre>
+<div class="sourceCode" id="cb54"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb54-1" title="1">Binv &lt;-<span class="st"> </span><span class="kw">as_r</span>(Binv1) <span class="co"># convert to R numeric matrix</span></a>
+<a class="sourceLine" id="cb54-2" title="2">Binv</a></code></pre></div>
+<pre><code>##         [,1]      [,2]       [,3]       [,4]        [,5]        [,6]
+## [1,]      64     -2016      20160     -92400      221760     -288288
+## [2,]   -2016     84672    -952560    4656960   -11642400    15567552
+## [3,]   20160   -952560   11430720  -58212000   149688000  -204324120
+## [4,]  -92400   4656960  -58212000  304920000  -800415000  1109908800
+## [5,]  221760 -11642400  149688000 -800415000  2134440000 -2996753760
+## [6,] -288288  15567552 -204324120 1109908800 -2996753760  4249941696
+## [7,]  192192 -10594584  141261120 -776936160  2118916800 -3030051024
+## [8,]  -51480   2882880  -38918880  216216000  -594594000   856215360
+##             [,7]       [,8]
+## [1,]      192192     -51480
+## [2,]   -10594584    2882880
+## [3,]   141261120  -38918880
+## [4,]  -776936160  216216000
+## [5,]  2118916800 -594594000
+## [6,] -3030051024  856215360
+## [7,]  2175421248 -618377760
+## [8,]  -618377760  176679360</code></pre>
+<div class="sourceCode" id="cb56"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb56-1" title="1">Ainv <span class="op">-</span><span class="st"> </span>Binv</a></code></pre></div>
+<pre><code>##               [,1]          [,2]          [,3]          [,4]          [,5]
+## [1,]  2.022656e-07 -7.897346e-06  0.0000742203 -0.0002794876  4.892563e-04
+## [2,] -7.516163e-06  2.443442e-04 -0.0016348482  0.0022857217  8.007960e-03
+## [3,]  6.596705e-05 -1.459678e-03 -0.0013010856  0.0928798467 -4.353278e-01
+## [4,] -2.222202e-04  6.508809e-04  0.1018696651 -1.0164485574  3.740381e+00
+## [5,]  3.084455e-04  1.383389e-02 -0.4781522453  3.8412284851 -1.304656e+01
+## [6,] -1.008651e-04 -3.762038e-02  0.9126323462 -6.7141628265  2.190641e+01
+## [7,] -1.274265e-04  3.748520e-02 -0.7896100283  5.5373635292 -1.763533e+01
+## [8,]  8.357911e-05 -1.313744e-02  0.2562877908 -1.7438534796  5.464779e+00
+##               [,6]          [,7]          [,8]
+## [1,] -3.859913e-04  9.308662e-05  1.726509e-05
+## [2,] -2.777486e-02  2.954033e-02 -1.067452e-02
+## [3,]  8.310004e-01 -7.192242e-01  2.335241e-01
+## [4,] -6.457403e+00  5.287978e+00 -1.657728e+00
+## [5,]  2.159914e+01 -1.723701e+01  5.309898e+00
+## [6,] -3.544080e+01  2.786332e+01 -8.493719e+00
+## [7,]  2.811761e+01 -2.189091e+01  6.626538e+00
+## [8,] -8.625638e+00  6.669370e+00 -2.008779e+00</code></pre>
+<div class="sourceCode" id="cb58"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb58-1" title="1"><span class="kw">max</span>(<span class="kw">abs</span>(Ainv <span class="op">-</span><span class="st"> </span>Binv))</a></code></pre></div>
+<pre><code>## [1] 35.4408</code></pre>
+<div class="sourceCode" id="cb60"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb60-1" title="1"><span class="kw">max</span>(<span class="kw">abs</span>((Ainv <span class="op">-</span><span class="st"> </span>Binv) <span class="op">/</span><span class="st"> </span>Binv))</a></code></pre></div>
+<pre><code>## [1] 1.136963e-08</code></pre>
+<p>As seen, already for <span class="math inline">\(n=8\)</span> is the numeric solution inaccurate.</p>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
