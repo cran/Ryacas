@@ -7,21 +7,29 @@
 Status](https://travis-ci.org/mikldk/ryacas.svg?branch=master)](https://travis-ci.org/mikldk/ryacas)
 [![Build
 status](https://ci.appveyor.com/api/projects/status/c8fsb1dvj5gmh703/branch/master?svg=true)](https://ci.appveyor.com/project/mikldk/ryacas/branch/master)
+[![JOSS
+status](https://joss.theoj.org/papers/69b3947f8900504a25aa36f65d14500b/status.svg)](https://joss.theoj.org/papers/69b3947f8900504a25aa36f65d14500b)
+[![DOI](https://zenodo.org/badge/36067045.svg)](https://zenodo.org/badge/latestdoi/36067045)
 
 Ryacas is an [R](https://www.r-project.org/) interface to the free
 [yacas](http://www.yacas.org) Computer Algebra System. Ryacas allows one
-to send R expressions, unprocessed yacas strings and certain other R
-objects to yacas process from R and get back the result. It also has
-facilities for manipulating yacas strings and R expressions destined for
-yacas processing.
+to send unprocessed yacas strings and certain other R objects to yacas
+process from R and get back the result. It also has facilities for
+manipulating yacas strings and R expressions destined for yacas
+processing.
 
-It can be used for exact arithmetic, symbolic math, ASCII pretty
-printing and translating R to TeX.
+It can be used for arbitrary-precision arithmetic, symbolic math, ASCII
+pretty printing and translating R to TeX.
 
 ## Install from GitHub
 
-To build and install from github using R 3.3.0 (or later) and the R
-`devtools` package 1.11.0 (or later) run this command from within R:
+To build and install from Github using R 3.3.0 (or later) and the R
+`devtools` package 1.11.0 (or later) run this command from within `R`:
+
+    devtools::install_github("mikldk/ryacas0", 
+                             build_opts = c("--no-resave-data", "--no-manual"))
+
+You can also install the package without vignettes if needed as follows:
 
     devtools::install_github("mikldk/ryacas")
 
@@ -32,6 +40,13 @@ installation instructions and a sample session see
 <http://mikldk.github.io/ryacas/>.
 
 Yacas documentation can be found at <http://yacas.readthedocs.org/>.
+
+## Contribute, issues, and support
+
+Please use the issue tracker at
+<https://github.com/mikldk/ryacas/issues> if you want to notify us of an
+issue or need support. If you want to contribute, please either create
+an issue or make a pull request.
 
 ## Brief examples
 
@@ -171,10 +186,11 @@ B %*% solve(B)
 
 ## Yacas
 
-The package contains stripped-down yacas distribution. For the complete
-yacas source code see <https://github.com/grzegorzmazur/yacas/> . For
-more information on yacas see <http://www.yacas.org/> or the documention
-directly at <https://yacas.readthedocs.io/>. .
+The package contains the yacas distribution. The development of the
+yacas source code is available at
+<https://github.com/grzegorzmazur/yacas/> . For more information on
+yacas see <http://www.yacas.org/> or the documention directly at
+<https://yacas.readthedocs.io/>.
 
 -----
 

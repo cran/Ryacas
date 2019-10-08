@@ -10,6 +10,8 @@
 #' @concept yac_symbol
 #' @export
 yac_symbol <- function(x) {
+  # TODO: Consider NSE: e.g. yac_symbol(4*x + 5*y) directly?
+  
   stopifnot(is.vector(x) | is.matrix(x))
   
   cmd <- if (is.matrix(x) | length(x) > 1L) {
@@ -67,8 +69,6 @@ y_fn.yac_symbol <- function(x, fn, ...) {
   z <- yac_symbol(y)
   return(z)
 }
-
-
 
 #' @export
 as_r.yac_symbol <- function(x) {
@@ -358,35 +358,115 @@ t.yac_symbol <- function(x) {
   return(v)
 }
 
-#' Solve a system of equations
-#' 
-#' This generic function solves the 
-#' equation $a %*% x = b$ for $x$.
-#' 
-#' @param a If `yac_symbol` treat as such, else 
-#' call [base::solve()].
-#' @param b If `yac_symbol` treat as such, else 
-#' call [base::solve()].
-#' @param \dots Not used
-#' 
-#' @export
-solve.yac_symbol <- function(a, b, ...) {
-  # FIXME: Currently Inverse, but implement general case
-  if (!missing(b)) {
-    stop("solve() currently only supports finding inverse")
-  }
+solve_yac_symbol_matrixinverse <- function(a) {
+  stopifnot(a$is_mat)
   
-  # To see if x is indeed a matrix
-  y_res <- yac_str(a$yacas_cmd)
-  y <- yac_symbol(y_res)
-
-  stopifnot(y$is_mat)
-  
-  z <- y_fn(x = y, fn = "Inverse")
+  z <- y_fn(x = a, fn = "Inverse")
   z_res <- yac_str(z)
   v <- yac_symbol(z_res)
   
   return(v)
+}
+
+solve_yac_symbol_linearsolve <- function(a, b) {
+  stopifnot(a$is_mat)
+  stopifnot(b$is_vec)
+  
+  stopifnot(nrow(a) == length(b))
+  
+  cmd <- paste0("SolveMatrix(", a$yacas_cmd, ", ", b$yacas_cmd, ")")
+  v <- yac_symbol(cmd)
+  
+  return(v)
+}
+  
+#' Solve a system of equations
+#' 
+#' This generic function solves the 
+#' equation $a x = b$ for $x$.
+#' 
+#' When `a` is a matrix and `b` not provided,
+#' this finds the inverse of `a`.
+#' When `a` is a matrix and a vector `b` is provided, the 
+#' linear system of equations is solved.
+#' 
+#' Note that solving non-linear equations:
+#' 
+#' * `solve(a, b)`: find roots of `a` for variable `b`, i.e. yacas `Solve(a == 0, b)`
+#' * `solve(a, b, v)`: find solutions to `a == b` for variable `v`, i.e. yacas `Solve(a == b, v)`
+#' 
+#' @param a A `yac_symbol` 
+#' @param b A `yac_symbol` or a value, see details and examples.
+#' @param \dots See details and examples.
+#' 
+#' @examples 
+#' A <- outer(0:3, 1:4, "-") + diag(2:5)
+#' a <- 1:4
+#' B <- yac_symbol(A)
+#' b <- yac_symbol(a)
+#' solve(A)
+#' solve(B)
+#' solve(A, a)
+#' solve(B, b)
+#' 
+#' poly <- yac_symbol("x^2 - x - 6")
+#' solve(poly, "x")    # Solve(poly == 0, x)
+#' solve(poly, 3, "x") # Solve(poly == 3, x)
+#' 
+#' @export
+solve.yac_symbol <- function(a, b, ...) {
+  if (!is(a, "yac_symbol")) {
+    stop("'a' must be a yac_symbol")
+  }
+
+  # If only a given:
+  if (missing(b)) {
+    # If a matrix:
+    if (a$is_mat) {
+      return(solve_yac_symbol_matrixinverse(a))
+    } else if (a$is_vec) {
+      stop("a cannot be a yac_symbol vector")
+    } else if (!a$is_vec) {
+      # a not matrix nor vector
+      stop("Trying to find roots? Please provide variable name, too")
+    } else {
+      stop("Should not occur")
+    }
+  } else {
+    # b also given:
+    
+    if (a$is_mat && b$is_vec) {
+      if (!is(b, "yac_symbol")) {
+        stop("'b' must be a yac_symbol.")
+      }
+      
+      return(solve_yac_symbol_linearsolve(a, b))
+    }
+    
+    if (!a$is_mat && !a$is_vec) {
+      dots <- list(...)
+      
+      if (length(dots) == 0L) {
+        if (is.character(b) && length(b) == 1L) {
+          # Solve(a, b)
+          cmd <- paste0("Solve(", a$yacas_cmd, ", ", b, ")")
+          res <- yac_symbol(cmd)
+          return(res)
+        }
+      } else if (length(dots) == 1L) {
+        v <- dots[[1L]]
+        
+        if (is.character(v) && length(v) == 1L) {
+          # Solve(a == b, v)
+          cmd <- paste0("Solve(", a$yacas_cmd, " == ", b, ", ", v, ")")
+          res <- yac_symbol(cmd)
+          return(res)
+        }
+      } 
+    }
+  }
+  
+  stop("Could not recognise the way that solve() was tried used on yac_symbol's.")
 }
 
 
@@ -490,6 +570,32 @@ solve.yac_symbol <- function(a, b, ...) {
   return(v)
 }
 
+
+
+
+#' Extract parts of an object
+#' 
+#' @param x A `yac_symbol`.
+#' @param i indices specifying elements to extract
+#' 
+#' @export
+`[[.yac_symbol` <- function(x, i) {
+  stopifnot(methods::is(x, "yac_symbol"))
+  stopifnot(x$is_vec)
+  
+  stopifnot(!is.null(i))
+  stopifnot(length(i) == 1L)
+  i <- as.integer(i)
+  
+  stopifnot(i >= 1L)
+  stopifnot(i <= length(x))
+  
+  v <- y_fn(x, "Nth", i)
+  
+  return(v)
+}
+
+
 #' @export
 print.yac_symbol <- function(x, ...) {
   y_res <- yac_str(x$yacas_cmd)
@@ -504,6 +610,15 @@ str.yac_symbol <- function(object, ...) {
   x <- object
   class(x) <- "list"
   return(str(x))
+}
+
+#' @export
+y_rmvars.yac_symbol <- function(x) {
+  # FIXME: Best API?
+  y <- y_rmvars(x$yacas_cmd)
+  v <- yac_symbol(y)
+  
+  return(v)
 }
 
 #' Math operators
@@ -573,3 +688,83 @@ Math.yac_symbol = function(x, ...) {
   x <- yac_symbol(txt)
   return(x)
 }
+
+
+#' Find the derivative of yac symbol
+#' 
+#' @param expr A `yac_symbol`
+#' @param \dots variables as character vector to take derivate with respect to
+#' 
+#' @concept yac_symbol
+#' 
+#' @export
+deriv.yac_symbol <- function(expr, ...) {
+  vars <- unlist(list(...))
+  
+  res <- unlist(lapply(vars, function(var) {
+    paste0("(D(", var, ") ", expr$yacas_cmd, ")")
+  }))
+  
+  res_sym <- yac_symbol(res)
+  
+  return(res_sym)
+}
+
+#' Find the Jacobian matrix of yac symbol
+#' 
+#' @param expr A `yac_symbol`
+#' @param \dots variables as character vector to take Jacobian with respect to
+#' 
+#' @concept yac_symbol
+#' 
+#' @export
+Jacobian <- function(expr, ...) {
+  UseMethod("Jacobian")
+}
+
+#' @export
+Jacobian.yac_symbol <- function(expr, ...) {
+  vars <- unlist(list(...))
+  
+  res <- paste0("JacobianMatrix( ", expr$yacas_cmd, ", {", 
+                paste0(vars, collapse = ", "), "})")
+  
+  res_sym <- yac_symbol(res)
+  return(res_sym)
+}
+
+#' Find the Hessian matrix of yac symbol
+#' 
+#' @param expr A `yac_symbol`
+#' @param \dots variables as character vector to take Hessian with respect to
+#' 
+#' @concept yac_symbol
+#' 
+#' @export
+Hessian <- function(expr, ...) {
+  UseMethod("Hessian")
+}
+
+#' @export
+Hessian.yac_symbol <- function(expr, ...) {
+  vars <- unlist(list(...))
+  
+  res <- paste0("HessianMatrix(", expr$yacas_cmd, ", {", 
+                paste0(vars, collapse = ", "), "})")
+  
+  res_sym <- yac_symbol(res)
+  return(res_sym)
+}
+
+#' Convert yac symbol to character
+#' 
+#' @param x A `yac_symbol`
+#' @param \dots not used
+#' 
+#' @concept yac_symbol
+#' 
+#' @export
+as.character.yac_symbol <- function(x, ...) {
+  return(x$yacas_cmd)
+}
+

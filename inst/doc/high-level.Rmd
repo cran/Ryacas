@@ -27,7 +27,16 @@ Start with a base symbol what can either be:
 * A `yacas` command, e.g. `x`, `2*a` or something similar
 * An `R` matrix or vector.
 
-Here, we keep it simple. Consider an `R` matrix and vector:
+Here, we keep it simple. 
+
+```{r}
+x <- yac_symbol("x")
+2*x^2 - 5
+c(-2, 5)*x
+as_r(c(-2, 5)*x) # or yac_expr(c(-2, 5)*x)
+```
+
+Then consider an `R` matrix and vector:
 
 ```{r}
 A <- outer(0:3, 1:4, "-") + diag(2:5)
@@ -41,8 +50,10 @@ They are now considered `yacas`-enabled:
 ```{r}
 B <- yac_symbol(A)
 B
+as_r(B)
 b <- yac_symbol(a)
 b
+as_r(b)
 ```
 
 Notice how they are printed using `yacas`'s syntax.
@@ -76,6 +87,8 @@ A %*% solve(A)
 B %*% solve(B)
 solve(A %*% t(A))
 solve(B %*% t(B))
+solve(A, a)
+solve(B, b)
 ```
 
 We can also assign a `yacas` variable, but remember that this may be difficult to distinguish:
@@ -93,6 +106,8 @@ yac_str("W") # Get variable W if exists, or else just a symbol
 ```
 
 
+# Simplify and output to TeX
+
 There are additional functions available:
 
 * `simplify()`
@@ -106,7 +121,7 @@ D
 D <- D/2
 D
 D[2:3, 1] <- "d"
-D[3,4] <- "2*d + 2"
+D[3, 4] <- "2*d + 2"
 D
 D %>% solve()
 D %>% solve() %>% simplify()
@@ -117,10 +132,80 @@ D %>% solve() %>% simplify() %>% tex()
 `r D %>% solve() %>% simplify() %>% tex()`
 \]
 
-
 `yacas` has a `Simplify()` function. This is made available via a `simplify()` function that also includes a time-out that prevents `yacas` in making the `R` session hang, but it requires that the `unix` package is available.
 The default `timeout` value used when `unix` is available is `2` seconds.
 
+# Derivatives
+
+We illustrate using the example in <https://mikl.dk/post/2019-pizza-frozen-yogurt-goebner/>:
+
+```{r}
+L <- yac_symbol("x^2 * (y/4) - a*(3*x + 3*y/2 - 45)")
+L
+```
+
+We can consider one variable only:
+
+```{r}
+deriv(L, "x")
+Hessian(L, "x")
+```
+
+Or multiple variables:
+
+```{r}
+deriv(L, c("x", "y", "a"))
+H <- Hessian(L, c("x", "y", "a"))
+H
+as_r(H)
+eval(as_r(H), list(x = 2, y = 2, a = 2))
+```
+
+The Jacobian is taken on a vector function denoted by many functions:
+
+```{r}
+L2 <- yac_symbol(c("x^2 * (y/4) - a*(3*x + 3*y/2 - 45)", 
+                   "x^3 + 4*a^2")) # just some function
+L2
+Jacobian(L2, "x")
+Jacobian(L2, c("x", "y", "a"))
+```
+
+
+# Solving equations
+
+Say we want to find roots of a polynomial. We use the generic `solve(a, b, ...)` function. 
+
+Note the conventions are as follows:
+
+* Linear system of equations (works as `R`'s `solve()` as demonstrated above):
+  + When `a` is a matrix and `b` not provided, this finds the inverse of `a`.
+  + When `a` is a matrix and a vector `b` is provided, the linear system of equations is solved.
+* Else:
+  + `solve(a, b)`: find roots of `a` for variable `b`, i.e. yacas `Solve(a == 0, b)`
+  + `solve(a, b, v)`: find solutions to `a == b` for variable `v`, i.e. yacas `Solve(a == b, v)`
+
+```{r}
+xs <- yac_symbol("x")
+poly <- xs^2 - xs - 6
+poly
+zeroes <- solve(poly, "x") # Solve(x^2 - x - 6 == 0, x)
+zeroes
+tex(zeroes)
+zeroes %>% y_rmvars()
+```
+
+We can also find values of `x` where the polynomial equals another constant. 
+If we were working with strings via the low-level interface it would be easy via `paste()`, but as we are working with `yac_symbol()`'s we use the `solve()` function directly:
+
+```{r}
+solve(poly, 3, "x") # Solve(x^2 - x - 6 == 3, x)
+solve(poly, 3, "x") %>% tex()
+```
+
+\[
+`r solve(poly, 3, "x") %>% tex()`
+\]
 
 # `Ryacas` high-level reference
 
@@ -128,7 +213,7 @@ Principle:
 
 * `yac_symbol(x)` converts `x` to a `yac_symbol` that automatically runs `yacas` when needed. `x` can both be a text string with `yacas` commands or an `R` vector/matrix.
 * `as_r(x)`: Is used to convert the `yac_symbol` back to an `R` representation.
-* `y_fn(x, fn, ...)`: Apply a `yacas` function `fn` to the `yac_symbol` `x`, i.e. `fn(x, ...)`
+* `y_fn(x, fn, ...)`: Apply a `yacas` function `fn` to the `yac_symbol` `x`, i.e. `fn(x, ...)`; note that this is evaluated immediately when `x` is a `yac_symbol` as opposed to when `x` is a string
 
 Reference:
 
@@ -142,18 +227,25 @@ The following functions work with `yac_symbol`s.
 * Other
   + `simplify(x, timeout = 2)`: Try `yacas`'s `Simplify()` function. When the `unix` package is available, the `timeout` (in seconds), stops trying after that amount of time to avoid making the `R` process hang.
   + `tex()`: Convert 
-* Stanard `R` that has been implemented for `yac_symbol`s:
+  + `y_fn(x, fn, ...)`: Apply a `yacas` function `fn` to the `yac_symbol` `x`, i.e. `fn(x, ...)`
+  + `y_rmvars(x)`: Remove variable names in `x`
+  + Derivatives:
+    - `deriv(expr, vars)`: takes derivative of `yac_symbol` `expr` with respect to `vars`
+    - `Jacobian(expr, vars)`: finds Jacobian of `yac_symbol` `expr` (usually a vector of expressions) with respect to `vars`
+    - `Hessian(expr, vars)`: finds Hessian matrix of `yac_symbol` `expr` with respect to `vars`
+* Standard `R` that has been implemented for `yac_symbol`s:
   + `print()`
   + `dim()`
   + `[` getter
   + `[<-` setter
+  + `[[` getter
   + `%*%` matrix/vector multiplication
   + `diag()` getter
   + `diag<-()` setter
   + `upper.tri()` getter
   + `lower.tri()` getter
   + `t()`
-  + `solve()` (only matrix inverse)
+  + `solve()` (see above and in help page)
   + Ops: `+`, `-`, `*`, `/`, `^`
   + Math functions: `sin()`, `cos()`, `tan()`, 
                     `asin()`, `acos()`, `atan()`, 

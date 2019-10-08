@@ -338,3 +338,81 @@ test_that("Setters for matrices", {
   }
 })
 
+test_that("Derivatives", {
+  L <- yac_symbol("x^2 * (y/4) - a*(3*x + 3*y/2 - 45)")
+  
+  # derivative
+  expect_equal(as.character(as_r(deriv(L, "x"))), 
+               "(x * y)/2 - 3 * a")
+  expect_equal(as.character(as_r(deriv(L, c("x", "y", "a")))), 
+               "c((x * y)/2 - 3 * a, x^2/4 - (3 * a)/2, 45 - (3 * x + (3 * y)/2))")
+  
+  # Hessian
+  expect_equal(as.character(as_r(Hessian(L, "x"))), 
+               "rbind(c(y/2))")
+  expect_equal(as.character(as_r(Hessian(L, c("x", "y", "a")))), 
+               "rbind(c(y/2, x/2, -3), c(x/2, 0, -3/2), c(-3, -3/2, 0))")
+  
+  # Jacobian
+  L2 <- yac_symbol(c("x^2 * (y/4) - a*(3*x + 3*y/2 - 45)", 
+                     "x^3 + 4*a^2")) # just some function
+  expect_equal(as.character(as_r(Jacobian(L2, "x"))), 
+               "rbind(c((x * y)/2 - 3 * a), c(3 * x^2))")
+  expect_equal(as.character(as_r(Jacobian(L2, c("x", "y", "a")))), 
+               paste0("rbind(c((x * y)/2 - 3 * a, x^2/4 - (3 * a)/2, ", 
+                      "45 - (3 * x + (3 * y)/2)), c(3 * x^2, 0, 8 * a))"))
+
+})
+
+
+
+test_that("solve linear system", {
+  # ------------------------------------
+  # Input validation
+  # ------------------------------------
+  poly <- yac_symbol("x^2 - x - 6")
+  expect_error(solve(poly))
+  
+  # ------------------------------------
+  # Matrix inverse
+  # ------------------------------------
+  A <- outer(0:3, 1:4, "-") + diag(2:5)
+  a <- 1:4
+  B <- yac_symbol(A)
+  b <- yac_symbol(a)
+  expect_equal(solve(A), as_r(solve(B)))
+  
+  # ------------------------------------
+  # Linear system of equations
+  # ------------------------------------
+  # Input validation
+  expect_error(solve(B, poly))
+  
+  # Functionality
+  expect_equal(solve(A, a), as_r(solve(B, b)))
+})
+
+test_that("solve (roots/others)", {
+  A <- outer(0:3, 1:4, "-") + diag(2:5)
+  a <- 1:4
+  B <- yac_symbol(A)
+  b <- yac_symbol(a)
+
+  
+  poly <- yac_symbol("x^2 - x - 6")
+  expect_error(solve(poly))
+  
+  expect_error(solve(B, poly))
+  expect_error(solve(poly, B))
+  expect_error(solve(poly, b))
+  
+  # Roots
+  expect_equal(as.character(solve(poly, "x")), "{x==(-2),x==3}")
+  expect_equal(as_r(y_rmvars(solve(poly, "x"))), c(-2, 3))
+  
+  # Equation
+  expect_equal(as.character(solve(poly, 3, "x")), "{x==(Sqrt(37)+1)/2,x==(1-Sqrt(37))/2}")
+  expect_equal(as.character(solve(poly, 3, "x")), as.character(solve(poly, "3", "x")))
+  expect_equal(as_r(y_rmvars(solve(poly, 3, "x"))), c(3.54138126514911, -2.54138126514911))
+})
+
