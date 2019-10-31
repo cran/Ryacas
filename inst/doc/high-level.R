@@ -5,9 +5,10 @@ knitr::opts_chunk$set(echo = TRUE)
 library(Ryacas)
 
 ## ------------------------------------------------------------------------
-x <- yac_symbol("x")
+x <- ysym("x")
 2*x^2 - 5
 c(-2, 5)*x
+c(2*x, -x^3)
 as_r(c(-2, 5)*x) # or yac_expr(c(-2, 5)*x)
 
 ## ------------------------------------------------------------------------
@@ -17,10 +18,10 @@ A
 a
 
 ## ------------------------------------------------------------------------
-B <- yac_symbol(A)
+B <- ysym(A)
 B
 as_r(B)
-b <- yac_symbol(a)
+b <- ysym(a)
 b
 as_r(b)
 
@@ -63,7 +64,7 @@ yac_str("Variables()") # List variables
 yac_str("W") # Get variable W if exists, or else just a symbol
 
 ## ------------------------------------------------------------------------
-D <- diag(4) %>% yac_symbol()
+D <- diag(4) %>% ysym()
 D
 D <- D/2
 D
@@ -75,7 +76,7 @@ D %>% solve() %>% simplify()
 D %>% solve() %>% simplify() %>% tex()
 
 ## ------------------------------------------------------------------------
-L <- yac_symbol("x^2 * (y/4) - a*(3*x + 3*y/2 - 45)")
+L <- ysym("x^2 * (y/4) - a*(3*x + 3*y/2 - 45)")
 L
 
 ## ------------------------------------------------------------------------
@@ -90,14 +91,14 @@ as_r(H)
 eval(as_r(H), list(x = 2, y = 2, a = 2))
 
 ## ------------------------------------------------------------------------
-L2 <- yac_symbol(c("x^2 * (y/4) - a*(3*x + 3*y/2 - 45)", 
+L2 <- ysym(c("x^2 * (y/4) - a*(3*x + 3*y/2 - 45)", 
                    "x^3 + 4*a^2")) # just some function
 L2
 Jacobian(L2, "x")
 Jacobian(L2, c("x", "y", "a"))
 
 ## ------------------------------------------------------------------------
-xs <- yac_symbol("x")
+xs <- ysym("x")
 poly <- xs^2 - xs - 6
 poly
 zeroes <- solve(poly, "x") # Solve(x^2 - x - 6 == 0, x)
@@ -108,4 +109,29 @@ zeroes %>% y_rmvars()
 ## ------------------------------------------------------------------------
 solve(poly, 3, "x") # Solve(x^2 - x - 6 == 3, x)
 solve(poly, 3, "x") %>% tex()
+
+## ------------------------------------------------------------------------
+x <- ysym("x")
+y <- ysym("y")
+lhs <- c(3*x*y - y, x)
+rhs <- c(-5*x, y+4)
+
+## ------------------------------------------------------------------------
+sol <- solve(lhs, rhs, c("x", "y"))
+sol
+sol_vals <- lapply(seq_len(nrow(sol)), function(sol_no) {
+  y_rmvars(sol[sol_no, ])
+})
+sol_vals
+sol_envir <- lapply(sol_vals, function(l) {
+  list(x = as_r(l[1]), y = as_r(l[2]))
+})
+sol_envir
+do.call(rbind, lapply(seq_along(sol_envir), function(sol_no) {
+  sol_val <- sol_envir[[sol_no]]
+  data.frame(sol_no = sol_no,
+             eq_no = seq_along(sol_val),
+             lhs = eval(as_r(lhs), sol_val),
+             rhs = eval(as_r(rhs), sol_val))
+}))
 

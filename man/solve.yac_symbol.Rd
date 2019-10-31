@@ -28,18 +28,20 @@ Note that solving non-linear equations:
 \item \code{solve(a, b)}: find roots of \code{a} for variable \code{b}, i.e. yacas \code{Solve(a == 0, b)}
 \item \code{solve(a, b, v)}: find solutions to \code{a == b} for variable \code{v}, i.e. yacas \code{Solve(a == b, v)}
 }
+
+This also works for a system of equations (when \code{a} is a vector)
 }
 \examples{
 A <- outer(0:3, 1:4, "-") + diag(2:5)
 a <- 1:4
-B <- yac_symbol(A)
-b <- yac_symbol(a)
+B <- ysym(A)
+b <- ysym(a)
 solve(A)
 solve(B)
 solve(A, a)
 solve(B, b)
 
-poly <- yac_symbol("x^2 - x - 6")
+poly <- ysym("x^2 - x - 6")
 solve(poly, "x")    # Solve(poly == 0, x)
 solve(poly, 3, "x") # Solve(poly == 3, x)
 

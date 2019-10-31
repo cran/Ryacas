@@ -29,7 +29,7 @@ expr
 eval(expr, list(x = 2))
 
 ## ------------------------------------------------------------------------
-eqy <- yac_symbol(eq)
+eqy <- ysym(eq)
 eqy
 as_r(eqy)
 eqy %>% y_fn("Factor") # Notice how we do not need to call yac_str()/yac_expr()
@@ -37,9 +37,9 @@ eqy %>% y_fn("Factor") # Notice how we do not need to call yac_str()/yac_expr()
 ## ------------------------------------------------------------------------
 A <- outer(0:3, 1:4, "-") + diag(2:5)
 a <- 1:4
-B <- yac_symbol(A)
+B <- ysym(A)
 B
-b <- yac_symbol(a)
+b <- ysym(a)
 b
 
 ## ------------------------------------------------------------------------
@@ -76,7 +76,7 @@ H <- 1/Hden
 H
 
 ## ------------------------------------------------------------------------
-Hyden <- yac_symbol(Hden)
+Hyden <- ysym(Hden)
 Hyden
 Hy <- 1/Hyden
 Hy
@@ -92,4 +92,44 @@ A[lower.tri(A)] <- "x"
 A
 as_r(A)
 eval(as_r(A), list(x = 999))
+
+## ------------------------------------------------------------------------
+x <- ysym("x")
+y <- ysym("y")
+f <- (1 - x)^2 + 100*(y - x^2)^2
+f
+tex(f)
+
+## ------------------------------------------------------------------------
+N <- 30
+x <- seq(-1, 2, length=N)
+y <- seq(-1, 2, length=N)
+f_r <- as_r(f)
+f_r
+z <- outer(x, y, function(x, y) eval(f_r, list(x = x, y = y)))
+levels <- c(0.001, .1, .3, 1:5, 10, 20, 30, 40, 50, 60, 80, 100, 500, 1000)
+cols <- rainbow(length(levels))
+contour(x, y, z, levels = levels, col = cols)
+
+## ------------------------------------------------------------------------
+g <- deriv(f, c("x", "y"))
+g
+
+## ------------------------------------------------------------------------
+crit_sol_all <- solve(g, c("x", "y"))
+crit_sol_all
+crit_sol <- crit_sol_all[1, ] %>% y_rmvars()
+crit_sol
+crit <- crit_sol %>% as_r()
+crit
+
+## ------------------------------------------------------------------------
+H <- Hessian(f, c("x", "y"))
+H
+tex(H)
+
+## ------------------------------------------------------------------------
+H_crit <- eval(as_r(H), list(x = crit[1], y = crit[2]))
+H_crit
+eigen(H_crit, only.values = TRUE)$values
 

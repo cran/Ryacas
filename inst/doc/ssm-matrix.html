@@ -13,7 +13,7 @@
 
 <meta name="author" content="Mikkel Meyer Andersen and Søren Højsgaard" />
 
-<meta name="date" content="2019-10-08" />
+<meta name="date" content="2019-10-31" />
 
 <title>The structure of the concentration and covariance matrix in a simple state-space model</title>
 
@@ -304,7 +304,7 @@ code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61
 
 <h1 class="title toc-ignore">The structure of the concentration and covariance matrix in a simple state-space model</h1>
 <h4 class="author">Mikkel Meyer Andersen and Søren Højsgaard</h4>
-<h4 class="date">2019-10-08</h4>
+<h4 class="date">2019-10-31</h4>
 
 
 
@@ -318,7 +318,7 @@ code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61
 <div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" title="1">N &lt;-<span class="st"> </span><span class="dv">3</span></a>
 <a class="sourceLine" id="cb2-2" title="2">L1chr &lt;-<span class="st"> </span><span class="kw">diag</span>(<span class="st">&quot;1&quot;</span>, <span class="dv">1</span> <span class="op">+</span><span class="st"> </span>N)</a>
 <a class="sourceLine" id="cb2-3" title="3">L1chr[<span class="kw">cbind</span>(<span class="dv">1</span><span class="op">+</span>(<span class="dv">1</span><span class="op">:</span>N), <span class="dv">1</span><span class="op">:</span>N)] &lt;-<span class="st"> &quot;-a&quot;</span></a>
-<a class="sourceLine" id="cb2-4" title="4">L1s &lt;-<span class="st"> </span><span class="kw">yac_symbol</span>(L1chr)</a>
+<a class="sourceLine" id="cb2-4" title="4">L1s &lt;-<span class="st"> </span><span class="kw">ysym</span>(L1chr)</a>
 <a class="sourceLine" id="cb2-5" title="5">L1s</a></code></pre></div>
 <pre><code>## {{ 1,  0,  0,  0},
 ##  {-a,  1,  0,  0},
@@ -342,7 +342,7 @@ code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61
 <a class="sourceLine" id="cb6-2" title="2">L2chr &lt;-<span class="st"> </span><span class="kw">diag</span>(<span class="st">&quot;1&quot;</span>, <span class="dv">1</span> <span class="op">+</span><span class="st"> </span><span class="dv">2</span><span class="op">*</span>N)</a>
 <a class="sourceLine" id="cb6-3" title="3">L2chr[<span class="kw">cbind</span>(<span class="dv">1</span><span class="op">+</span>(<span class="dv">1</span><span class="op">:</span>N), <span class="dv">1</span><span class="op">:</span>N)] &lt;-<span class="st"> &quot;-a&quot;</span></a>
 <a class="sourceLine" id="cb6-4" title="4">L2chr[<span class="kw">cbind</span>(<span class="dv">1</span> <span class="op">+</span><span class="st"> </span>N <span class="op">+</span><span class="st"> </span>(<span class="dv">1</span><span class="op">:</span>N), <span class="dv">1</span> <span class="op">+</span><span class="st"> </span><span class="dv">1</span><span class="op">:</span>N)] &lt;-<span class="st"> &quot;-b&quot;</span></a>
-<a class="sourceLine" id="cb6-5" title="5">L2s &lt;-<span class="st"> </span><span class="kw">yac_symbol</span>(L2chr)</a>
+<a class="sourceLine" id="cb6-5" title="5">L2s &lt;-<span class="st"> </span><span class="kw">ysym</span>(L2chr)</a>
 <a class="sourceLine" id="cb6-6" title="6">L2s</a></code></pre></div>
 <pre><code>## {{ 1,  0,  0,  0,  0,  0,  0},
 ##  {-a,  1,  0,  0,  0,  0,  0},

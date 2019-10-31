@@ -13,7 +13,7 @@
 
 <meta name="author" content="Mikkel Meyer Andersen and Søren Højsgaard" />
 
-<meta name="date" content="2019-10-08" />
+<meta name="date" content="2019-10-31" />
 
 <title>The structure of the concentration and covariance matrix in a naive Bayes model</title>
 
@@ -304,7 +304,7 @@ code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61
 
 <h1 class="title toc-ignore">The structure of the concentration and covariance matrix in a naive Bayes model</h1>
 <h4 class="author">Mikkel Meyer Andersen and Søren Højsgaard</h4>
-<h4 class="date">2019-10-08</h4>
+<h4 class="date">2019-10-31</h4>
 
 
 
@@ -318,7 +318,7 @@ x_i = a x_0 + e_i, \quad i=1, \dots, 4
 \]</span> where <span class="math inline">\(L_1\)</span> has the form</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" title="1">L1chr &lt;-<span class="st"> </span><span class="kw">diag</span>(<span class="dv">4</span>)</a>
 <a class="sourceLine" id="cb2-2" title="2">L1chr[<span class="dv">2</span><span class="op">:</span><span class="dv">4</span>, <span class="dv">1</span>] &lt;-<span class="st"> &quot;-a&quot;</span></a>
-<a class="sourceLine" id="cb2-3" title="3">L1 &lt;-<span class="st"> </span><span class="kw">yac_symbol</span>(L1chr)</a>
+<a class="sourceLine" id="cb2-3" title="3">L1 &lt;-<span class="st"> </span><span class="kw">ysym</span>(L1chr)</a>
 <a class="sourceLine" id="cb2-4" title="4">L1</a></code></pre></div>
 <pre><code>## {{ 1,  0,  0,  0},
 ##  {-a,  1,  0,  0},
@@ -340,7 +340,7 @@ x_i = a x_0 + e_i, \quad i=1, \dots, 4
 <p>Slightly more elaborate:</p>
 <div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" title="1">L2chr &lt;-<span class="st"> </span><span class="kw">diag</span>(<span class="dv">4</span>)</a>
 <a class="sourceLine" id="cb6-2" title="2">L2chr[<span class="dv">2</span><span class="op">:</span><span class="dv">4</span>, <span class="dv">1</span>] &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;-a1&quot;</span>, <span class="st">&quot;-a2&quot;</span>, <span class="st">&quot;-a3&quot;</span>)</a>
-<a class="sourceLine" id="cb6-3" title="3">L2 &lt;-<span class="st"> </span><span class="kw">yac_symbol</span>(L2chr)</a>
+<a class="sourceLine" id="cb6-3" title="3">L2 &lt;-<span class="st"> </span><span class="kw">ysym</span>(L2chr)</a>
 <a class="sourceLine" id="cb6-4" title="4">L2</a></code></pre></div>
 <pre><code>## {{  1,   0,   0,   0},
 ##  {-a1,   1,   0,   0},
@@ -348,7 +348,7 @@ x_i = a x_0 + e_i, \quad i=1, \dots, 4
 ##  {-a3,   0,   0,   1}}</code></pre>
 <div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" title="1">Vechr &lt;-<span class="st"> </span><span class="kw">diag</span>(<span class="dv">4</span>)</a>
 <a class="sourceLine" id="cb8-2" title="2">Vechr[<span class="kw">cbind</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">4</span>, <span class="dv">1</span><span class="op">:</span><span class="dv">4</span>)] &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;w1&quot;</span>, <span class="st">&quot;w2&quot;</span>, <span class="st">&quot;w2&quot;</span>, <span class="st">&quot;w2&quot;</span>)</a>
-<a class="sourceLine" id="cb8-3" title="3">Ve &lt;-<span class="st"> </span><span class="kw">yac_symbol</span>(Vechr)</a>
+<a class="sourceLine" id="cb8-3" title="3">Ve &lt;-<span class="st"> </span><span class="kw">ysym</span>(Vechr)</a>
 <a class="sourceLine" id="cb8-4" title="4">Ve</a></code></pre></div>
 <pre><code>## {{w1,  0,  0,  0},
 ##  { 0, w2,  0,  0},

@@ -13,7 +13,7 @@
 
 <meta name="author" content="Mikkel Meyer Andersen and Søren Højsgaard" />
 
-<meta name="date" content="2019-10-08" />
+<meta name="date" content="2019-10-31" />
 
 <title>The low-level interface</title>
 
@@ -304,7 +304,7 @@ code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61
 
 <h1 class="title toc-ignore">The low-level interface</h1>
 <h4 class="author">Mikkel Meyer Andersen and Søren Højsgaard</h4>
-<h4 class="date">2019-10-08</h4>
+<h4 class="date">2019-10-31</h4>
 
 
 
@@ -508,7 +508,7 @@ code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61
 <div class="sourceCode" id="cb89"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb89-1" title="1"><span class="kw">yac_silent</span>(<span class="st">&quot;poly := (x-3)*(x+2)&quot;</span>)</a></code></pre></div>
 <p>We can now list <code>yacas</code> variables (<code>I</code> is the imaginary unit):</p>
 <div class="sourceCode" id="cb90"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb90-1" title="1"><span class="kw">yac_str</span>(<span class="st">&quot;Variables()&quot;</span>)</a></code></pre></div>
-<pre><code>## [1] &quot;{I,poly,j,rformBitwiseOps,nd}&quot;</code></pre>
+<pre><code>## [1] &quot;{poly,Arow,t,I,rformBitwiseOps,nd,j}&quot;</code></pre>
 <div class="sourceCode" id="cb92"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb92-1" title="1"><span class="kw">yac_str</span>(<span class="st">&quot;Expand(poly)&quot;</span>)</a></code></pre></div>
 <pre><code>## [1] &quot;x^2-x-6&quot;</code></pre>
 <div class="sourceCode" id="cb94"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb94-1" title="1"><span class="st">&quot;poly&quot;</span> <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">y_fn</span>(<span class="st">&quot;Expand&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">yac_str</span>()</a></code></pre></div>

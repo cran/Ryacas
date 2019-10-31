@@ -6,6 +6,11 @@
 #' 
 #' @export
 as_y <- function(x) {
+  UseMethod("as_y")
+}
+
+#' @export
+as_y.default <- function(x) {
   if (is.matrix(x)) {
     return(y_hlp_to_yacmat(x))
   }
@@ -16,7 +21,7 @@ as_y <- function(x) {
 #' Convert yacas object to R
 #' 
 #' If `x` is a yacas command as string, convert to a character vector/matrix in R.
-#' If `x` is a `yac_symbol` (e.g. from [yac_symbol()]), then convert it to a numeric object 
+#' If `x` is a `yac_symbol` (e.g. from [ysym()]), then convert it to a numeric object 
 #' if there are no variables or a character type if there are variables.
 #' 
 #' In yacas a vector is a list, and a matrix is a list of lists.
@@ -34,13 +39,16 @@ as_r <- function(x) {
 expr_has_vars <- function(x) {
   y_vars <- all.vars(x)
   
+  # Known "vars"
+  y_vars <- setdiff(y_vars, 
+                    c("pi"))
+  
   if (length(y_vars) > 0L) {
     return(TRUE)
   }
   
   return(FALSE)
 }
-
 
 #' @export
 as_r.default <- function(x) {
@@ -57,6 +65,7 @@ as_r.default <- function(x) {
   }
   
   y <- yac_expr(x)
+  
   if (expr_has_vars(y)) {
     return(y)
   }
