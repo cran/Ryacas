@@ -55,7 +55,7 @@ a <- 1:4
 test_that("ysym()", {
   B <- ysym(A)
   b <- ysym(a)
-
+  
   expect_s3_class(B, "yac_symbol")
   expect_s3_class(b, "yac_symbol")
   
@@ -85,13 +85,21 @@ test_that("yac_silent()", {
 })
 
 test_that("tex()", {
-  expect_equal(tex(B), yac_str(y_fn(as_y(A), "TeXForm")))
-  expect_equal(tex(B), yac_str(y_fn(as_y(A), "TeXForm")))
+  trm <- function(x) {
+    x <- gsub("^[ ]*", "", x)
+    x <- gsub("[ ]*$", "", x)
+    x
+  }
+  
+  expect_equal(tex(B), trm(yac_str(y_fn(as_y(A), "TeXForm"))))
+  expect_equal(tex(B), trm(yac_str(y_fn(as_y(A), "TeXForm"))))
 })
 
 test_that("y_fn", {
   expect_equal(t(A), as_r(y_fn(B, "Transpose")))
   expect_equal(sum(diag(A)), as_r(y_fn(B, "Trace")))
+  
+  expect_equal(y_fn(ysym(a), "TeXForm"), "\\left( 1, 2, 3, 4\\right) ")
 })
 
 test_that("as_r", {
@@ -186,7 +194,7 @@ test_that("solve()", {
   
   A1 <- hilbert_r(4)
   B1 <- ysym(as_y(hilbert_y(4)))
-
+  
   expect_equal(A1, as_r(B1))
   expect_equal(solve(A1), as_r(solve(B1)))
 })
@@ -240,7 +248,7 @@ test_that("Getters for matrices", {
   # Subsets of size 1, 2, ..., nrow(A)
   for (indices_count in src) {
     idx <- combn(src, indices_count)
-
+    
     # All rows
     for (i in 1L:ncol(idx)) {
       i_idx <- idx[, i]
@@ -264,8 +272,19 @@ test_that("Getters for matrices", {
       for (i2 in (i1+1L):ncol(idx)) {
         i2_idx <- idx[, i2]
         
+        expect_equal(gsub(" ", "", as_y(A[i1_idx, i2_idx]), fixed = TRUE),
+                     gsub(" ", "", as_y(B[i1_idx, i2_idx]), fixed = TRUE), 
+                     info = paste0("y: indices_count = ", indices_count, 
+                                   ", i1 = ", i1, "; i2 = ", i2))
+        
+        expect_equal(ysym(as_y(A[i1_idx, i2_idx])),
+                     B[i1_idx, i2_idx], 
+                     info = paste0("chr: indices_count = ", indices_count, 
+                                   ", i1 = ", i1, "; i2 = ", i2))
+        
         expect_equal(A[i1_idx, i2_idx], as_r(B[i1_idx, i2_idx]), 
-                     info = paste0("i1 = ", i1, "; i2 = ", i2))
+                     info = paste0("as_r: indices_count = ", indices_count, 
+                                   ", i1 = ", i1, "; i2 = ", i2))
       }
     }
   }
@@ -286,7 +305,7 @@ test_that("Setters for matrices", {
     
     A1[i] <- 999
     B1[i] <- 999
-
+    
     expect_equal(A1, as_r(B1))
   }
   
@@ -299,7 +318,7 @@ test_that("Setters for matrices", {
     # All rows
     for (i in 1L:ncol(idx)) {
       i_idx <- idx[, i]
-
+      
       A1 <- A
       B1 <- B
       A1[i_idx, ] <- 999
@@ -392,13 +411,13 @@ test_that("Derivatives", {
   
   # Jacobian
   L2 <- ysym(c("x^2 * (y/4) - a*(3*x + 3*y/2 - 45)", 
-                     "x^3 + 4*a^2")) # just some function
+               "x^3 + 4*a^2")) # just some function
   expect_equal(as.character(as_r(Jacobian(L2, "x"))), 
                "rbind(c((x * y)/2 - 3 * a), c(3 * x^2))")
   expect_equal(as.character(as_r(Jacobian(L2, c("x", "y", "a")))), 
                paste0("rbind(c((x * y)/2 - 3 * a, x^2/4 - (3 * a)/2, ", 
                       "45 - (3 * x + (3 * y)/2)), c(3 * x^2, 0, 8 * a))"))
-
+  
 })
 
 
@@ -434,7 +453,7 @@ test_that("solve (roots/others)", {
   a <- 1:4
   B <- ysym(A)
   b <- ysym(a)
-
+  
   
   poly <- ysym("x^2 - x - 6")
   expect_error(solve(poly))
@@ -466,8 +485,7 @@ test_that("integrate", {
   expect_equal(eval(as_r(res), list(x = 1)), -0.25)
 })
 
-
-test_that("sum", {
+test_that("sum(x, var, lwr, upr)", {
   res <- sum(1:10)
   expect_equal(res, 55)
   
@@ -481,7 +499,87 @@ test_that("sum", {
   expect_equal(as_r(res), pi^2/6)
 })
 
-test_that("sum", {
+test_that("c()", {
+  x <- ysym("x")
+  
+  vec <- c(2*x^2, x+2, 4-x/2)
+  expect_equal(as.character(vec), "{2*x^2,x+2,4-x/2}")
+  expect_equal(as_y(vec), "{2*x^2,x+2,4-x/2}")
+  
+  vec2 <- c(vec, vec)
+  expect_equal(as.character(vec2), "{2*x^2,x+2,4-x/2,2*x^2,x+2,4-x/2}")
+  expect_equal(as_y(vec2), "{2*x^2,x+2,4-x/2,2*x^2,x+2,4-x/2}")
+  
+  man_x <- ysym("{x, 2}")
+  vec3 <- c(man_x, man_x)
+  expect_equal(as.character(vec3), "{x,2,x,2}")
+  expect_equal(as_y(vec3), "{x,2,x,2}")
+})
+
+test_that("c()", {
+  x <- ysym("x")
+  
+  vec <- c(2*x^2, x+2, 4-x/2)
+  expect_equal(as.character(vec), "{2*x^2,x+2,4-x/2}")
+  expect_equal(as_y(vec), "{2*x^2,x+2,4-x/2}")
+  
+  vec2 <- c(vec, vec)
+  expect_equal(as.character(vec2), "{2*x^2,x+2,4-x/2,2*x^2,x+2,4-x/2}")
+  expect_equal(as_y(vec2), "{2*x^2,x+2,4-x/2,2*x^2,x+2,4-x/2}")
+  
+  man_x <- ysym("{x, 2}")
+  vec3 <- c(man_x, man_x)
+  expect_equal(as.character(vec3), "{x,2,x,2}")
+  expect_equal(as_y(vec3), "{x,2,x,2}")
+})
+
+test_that("rbind()", {
+  x <- ysym("x")
+  
+  m <- rbind(x, x)
+  expect_equal(dim(m), c(2, 1))
+  expect_equal(as_y(m), "{{x},{x}}")
+  
+  vec <- c(2*x^2, x+2, 4-x/2)
+  expect_error(rbind(vec, x))
+  m2 <- rbind(vec, vec)
+  expect_equal(dim(m2), c(2, length(vec)))
+  expect_equal(as_y(m2), "{{2*x^2,x+2,4-x/2},{2*x^2,x+2,4-x/2}}")
+})
+
+test_that("cbind()", {
+  x <- ysym("x")
+  
+  m <- cbind(x, x)
+  expect_equal(dim(m), c(1, 2))
+  expect_equal(as_y(m), "{{x,x}}")
+  
+  vec <- c(2*x^2, x+2, 4-x/2)
+  expect_error(cbind(vec, x))
+  m2 <- cbind(vec, vec)
+  expect_equal(dim(m2), c(length(vec), 2))
+  expect_equal(as_y(m2), "{{2*x^2,2*x^2},{x+2,x+2},{4-x/2,4-x/2}}")
+})
+
+
+test_that("sum(x)/prod(x)", {
+  x <- ysym("x")
+  
+  res <- sum(c(4*x, 3))
+  expect_equal(as.character(res), "4*x+3")
+  
+  res <- prod(c(4*x, 3))
+  expect_equal(as.character(res), "12*x")
+  
+  vec <- c(2*x^2, x+2, 4-x/2)
+  res <- sum(vec)
+  expect_equal(as.character(res), "2*x^2+x-x/2+6")
+  
+  res <- prod(vec)
+  expect_equal(as.character(res), "2*x^2*(x+2)*(4-x/2)")
+})
+
+test_that("lim", {
   xs <- ysym("x")
   
   res <- lim(sin(xs)/xs, "x", 0)
@@ -501,4 +599,23 @@ test_that("sum", {
   res <- lim(1/xs, "x", 0, from_right = TRUE)
   expect_equal(as.character(res), "Infinity")
   expect_equal(as_r(res), Inf)
+})
+
+
+
+test_that("with_value", {
+  xs <- ysym("x")
+  ys <- ysym("y")
+  
+  expr1 <- 2*xs + 4*ys
+  expect_equal(as.character(with_value(expr1, xs, 2)), "4*y+4")
+  expect_equal(as.character(with_value(expr1, "x", 2)), "4*y+4")
+  expect_equal(as.character(with_value(expr1, xs, 0)), "4*y")
+  expect_equal(as.character(with_value(expr1, "x", 0)), "4*y")
+  
+  expr2 <- c(expr1, 2*expr1)
+  expect_equal(as.character(with_value(expr2, xs, 2)), "{4*y+4,2*(4*y+4)}")
+  expect_equal(as.character(with_value(expr2, "x", 2)), "{4*y+4,2*(4*y+4)}")
+  expect_equal(as.character(with_value(with_value(expr2, xs, 2), ys, 4)), "{20,40}")
+  expect_equal(as.character(with_value(with_value(expr2, xs, 0), ys, 0)), "{0,0}")
 })

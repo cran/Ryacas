@@ -1,11 +1,10 @@
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
 
 <head>
 
 <meta charset="utf-8" />
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta name="generator" content="pandoc" />
 <meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
@@ -13,7 +12,7 @@
 
 <meta name="author" content="Mikkel Meyer Andersen and Søren Højsgaard" />
 
-<meta name="date" content="2019-10-31" />
+<meta name="date" content="2020-01-07" />
 
 <title>The structure of the concentration and covariance matrix in a naive Bayes model</title>
 
@@ -38,7 +37,7 @@ a.sourceLine { text-indent: -1em; padding-left: 1em; }
 pre.numberSource a.sourceLine
   { position: relative; left: -4em; }
 pre.numberSource a.sourceLine::before
-  { content: attr(title);
+  { content: attr(data-line-number);
     position: relative; left: -1em; text-align: right; vertical-align: baseline;
     border: none; pointer-events: all; display: inline-block;
     -webkit-touch-callout: none; -webkit-user-select: none;
@@ -304,11 +303,11 @@ code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61
 
 <h1 class="title toc-ignore">The structure of the concentration and covariance matrix in a naive Bayes model</h1>
 <h4 class="author">Mikkel Meyer Andersen and Søren Højsgaard</h4>
-<h4 class="date">2019-10-31</h4>
+<h4 class="date">2020-01-07</h4>
 
 
 
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" title="1"><span class="kw">library</span>(Ryacas)</a></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1"><span class="kw">library</span>(Ryacas)</a></code></pre></div>
 <div id="naive-bayes-model" class="section level2">
 <h2>Naive Bayes model</h2>
 <p>Consider this model: <span class="math display">\[
@@ -316,55 +315,55 @@ x_i = a x_0 + e_i, \quad i=1, \dots, 4
 \]</span> and <span class="math inline">\(x_0=e_0\)</span>. All terms <span class="math inline">\(e_0, \dots, e_3\)</span> are independent and <span class="math inline">\(N(0,1)\)</span> distributed. Let <span class="math inline">\(e=(e_0, \dots, e_3)\)</span> and <span class="math inline">\(x=(x_0, \dots x_3)\)</span>. Isolating error terms gives that <span class="math display">\[
  e = L_1 x
 \]</span> where <span class="math inline">\(L_1\)</span> has the form</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" title="1">L1chr &lt;-<span class="st"> </span><span class="kw">diag</span>(<span class="dv">4</span>)</a>
-<a class="sourceLine" id="cb2-2" title="2">L1chr[<span class="dv">2</span><span class="op">:</span><span class="dv">4</span>, <span class="dv">1</span>] &lt;-<span class="st"> &quot;-a&quot;</span></a>
-<a class="sourceLine" id="cb2-3" title="3">L1 &lt;-<span class="st"> </span><span class="kw">ysym</span>(L1chr)</a>
-<a class="sourceLine" id="cb2-4" title="4">L1</a></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" data-line-number="1">L1chr &lt;-<span class="st"> </span><span class="kw">diag</span>(<span class="dv">4</span>)</a>
+<a class="sourceLine" id="cb2-2" data-line-number="2">L1chr[<span class="dv">2</span><span class="op">:</span><span class="dv">4</span>, <span class="dv">1</span>] &lt;-<span class="st"> &quot;-a&quot;</span></a>
+<a class="sourceLine" id="cb2-3" data-line-number="3">L1 &lt;-<span class="st"> </span><span class="kw">ysym</span>(L1chr)</a>
+<a class="sourceLine" id="cb2-4" data-line-number="4">L1</a></code></pre></div>
 <pre><code>## {{ 1,  0,  0,  0},
 ##  {-a,  1,  0,  0},
 ##  {-a,  0,  1,  0},
 ##  {-a,  0,  0,  1}}</code></pre>
-<p>If error terms have variance <span class="math inline">\(1\)</span> then <span class="math inline">\(\mathbf{Var}(e)=L \mathbf{Var}(x) L&#39;\)</span> so the covariance matrix is <span class="math inline">\(V1=\mathbf{Var}(x) = L^- (L^-)&#39;\)</span> while the concentration matrix (the inverse covariances matrix) is <span class="math inline">\(K=L&#39; L\)</span>.</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" title="1">L1inv &lt;-<span class="st"> </span><span class="kw">solve</span>(L1)</a>
-<a class="sourceLine" id="cb4-2" title="2">K1 &lt;-<span class="st"> </span><span class="kw">t</span>(L1) <span class="op">%*%</span><span class="st"> </span>L1</a>
-<a class="sourceLine" id="cb4-3" title="3">V1 &lt;-<span class="st"> </span>L1inv <span class="op">%*%</span><span class="st"> </span><span class="kw">t</span>(L1inv)</a></code></pre></div>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" title="1"><span class="kw">cat</span>(</a>
-<a class="sourceLine" id="cb5-2" title="2">  <span class="st">&quot;</span><span class="ch">\\</span><span class="st">begin{align} </span></a>
-<a class="sourceLine" id="cb5-3" title="3"><span class="st">    K_1 &amp;= &quot;</span>, <span class="kw">tex</span>(K1), <span class="st">&quot; </span><span class="ch">\\\\</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb5-4" title="4"><span class="st">   V_1 &amp;= &quot;</span>, <span class="kw">tex</span>(V1), <span class="st">&quot; </span></a>
-<a class="sourceLine" id="cb5-5" title="5"><span class="st">  </span><span class="ch">\\</span><span class="st">end{align}&quot;</span>, <span class="dt">sep =</span> <span class="st">&quot;&quot;</span>)</a></code></pre></div>
+<p>If error terms have variance <span class="math inline">\(1\)</span> then <span class="math inline">\(\mathbf{Var}(e)=L \mathbf{Var}(x) L'\)</span> so the covariance matrix is <span class="math inline">\(V1=\mathbf{Var}(x) = L^- (L^-)'\)</span> while the concentration matrix (the inverse covariances matrix) is <span class="math inline">\(K=L' L\)</span>.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" data-line-number="1">L1inv &lt;-<span class="st"> </span><span class="kw">solve</span>(L1)</a>
+<a class="sourceLine" id="cb4-2" data-line-number="2">K1 &lt;-<span class="st"> </span><span class="kw">t</span>(L1) <span class="op">%*%</span><span class="st"> </span>L1</a>
+<a class="sourceLine" id="cb4-3" data-line-number="3">V1 &lt;-<span class="st"> </span>L1inv <span class="op">%*%</span><span class="st"> </span><span class="kw">t</span>(L1inv)</a></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" data-line-number="1"><span class="kw">cat</span>(</a>
+<a class="sourceLine" id="cb5-2" data-line-number="2">  <span class="st">&quot;</span><span class="ch">\\</span><span class="st">begin{align} </span></a>
+<a class="sourceLine" id="cb5-3" data-line-number="3"><span class="st">    K_1 &amp;= &quot;</span>, <span class="kw">tex</span>(K1), <span class="st">&quot; </span><span class="ch">\\\\</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb5-4" data-line-number="4"><span class="st">   V_1 &amp;= &quot;</span>, <span class="kw">tex</span>(V1), <span class="st">&quot; </span></a>
+<a class="sourceLine" id="cb5-5" data-line-number="5"><span class="st">  </span><span class="ch">\\</span><span class="st">end{align}&quot;</span>, <span class="dt">sep =</span> <span class="st">&quot;&quot;</span>)</a></code></pre></div>
 <p><span class="math display">\[\begin{align} 
-    K_1 &amp;= \left( \begin{array}{cccc} 3 a ^{2} + 1 &amp;  - a &amp;  - a &amp;  - a \\  - a &amp; 1 &amp; 0 &amp; 0 \\  - a &amp; 0 &amp; 1 &amp; 0 \\  - a &amp; 0 &amp; 0 &amp; 1 \end{array} \right)  \\ 
-   V_1 &amp;= \left( \begin{array}{cccc} 1 &amp; a &amp; a &amp; a \\ a &amp; a ^{2} + 1 &amp; a ^{2} &amp; a ^{2} \\ a &amp; a ^{2} &amp; a ^{2} + 1 &amp; a ^{2} \\ a &amp; a ^{2} &amp; a ^{2} &amp; a ^{2} + 1 \end{array} \right)  
+    K_1 &amp;= \left( \begin{array}{cccc} 3 a ^{2} + 1 &amp;  - a &amp;  - a &amp;  - a \\  - a &amp; 1 &amp; 0 &amp; 0 \\  - a &amp; 0 &amp; 1 &amp; 0 \\  - a &amp; 0 &amp; 0 &amp; 1 \end{array} \right) \\ 
+   V_1 &amp;= \left( \begin{array}{cccc} 1 &amp; a &amp; a &amp; a \\ a &amp; a ^{2} + 1 &amp; a ^{2} &amp; a ^{2} \\ a &amp; a ^{2} &amp; a ^{2} + 1 &amp; a ^{2} \\ a &amp; a ^{2} &amp; a ^{2} &amp; a ^{2} + 1 \end{array} \right) 
   \end{align}\]</span></p>
 <p>Slightly more elaborate:</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" title="1">L2chr &lt;-<span class="st"> </span><span class="kw">diag</span>(<span class="dv">4</span>)</a>
-<a class="sourceLine" id="cb6-2" title="2">L2chr[<span class="dv">2</span><span class="op">:</span><span class="dv">4</span>, <span class="dv">1</span>] &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;-a1&quot;</span>, <span class="st">&quot;-a2&quot;</span>, <span class="st">&quot;-a3&quot;</span>)</a>
-<a class="sourceLine" id="cb6-3" title="3">L2 &lt;-<span class="st"> </span><span class="kw">ysym</span>(L2chr)</a>
-<a class="sourceLine" id="cb6-4" title="4">L2</a></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" data-line-number="1">L2chr &lt;-<span class="st"> </span><span class="kw">diag</span>(<span class="dv">4</span>)</a>
+<a class="sourceLine" id="cb6-2" data-line-number="2">L2chr[<span class="dv">2</span><span class="op">:</span><span class="dv">4</span>, <span class="dv">1</span>] &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;-a1&quot;</span>, <span class="st">&quot;-a2&quot;</span>, <span class="st">&quot;-a3&quot;</span>)</a>
+<a class="sourceLine" id="cb6-3" data-line-number="3">L2 &lt;-<span class="st"> </span><span class="kw">ysym</span>(L2chr)</a>
+<a class="sourceLine" id="cb6-4" data-line-number="4">L2</a></code></pre></div>
 <pre><code>## {{  1,   0,   0,   0},
 ##  {-a1,   1,   0,   0},
 ##  {-a2,   0,   1,   0},
 ##  {-a3,   0,   0,   1}}</code></pre>
-<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" title="1">Vechr &lt;-<span class="st"> </span><span class="kw">diag</span>(<span class="dv">4</span>)</a>
-<a class="sourceLine" id="cb8-2" title="2">Vechr[<span class="kw">cbind</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">4</span>, <span class="dv">1</span><span class="op">:</span><span class="dv">4</span>)] &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;w1&quot;</span>, <span class="st">&quot;w2&quot;</span>, <span class="st">&quot;w2&quot;</span>, <span class="st">&quot;w2&quot;</span>)</a>
-<a class="sourceLine" id="cb8-3" title="3">Ve &lt;-<span class="st"> </span><span class="kw">ysym</span>(Vechr)</a>
-<a class="sourceLine" id="cb8-4" title="4">Ve</a></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" data-line-number="1">Vechr &lt;-<span class="st"> </span><span class="kw">diag</span>(<span class="dv">4</span>)</a>
+<a class="sourceLine" id="cb8-2" data-line-number="2">Vechr[<span class="kw">cbind</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">4</span>, <span class="dv">1</span><span class="op">:</span><span class="dv">4</span>)] &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;w1&quot;</span>, <span class="st">&quot;w2&quot;</span>, <span class="st">&quot;w2&quot;</span>, <span class="st">&quot;w2&quot;</span>)</a>
+<a class="sourceLine" id="cb8-3" data-line-number="3">Ve &lt;-<span class="st"> </span><span class="kw">ysym</span>(Vechr)</a>
+<a class="sourceLine" id="cb8-4" data-line-number="4">Ve</a></code></pre></div>
 <pre><code>## {{w1,  0,  0,  0},
 ##  { 0, w2,  0,  0},
 ##  { 0,  0, w2,  0},
 ##  { 0,  0,  0, w2}}</code></pre>
-<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb10-1" title="1">L2inv &lt;-<span class="st"> </span><span class="kw">solve</span>(L2)</a>
-<a class="sourceLine" id="cb10-2" title="2">K2 &lt;-<span class="st"> </span><span class="kw">t</span>(L2) <span class="op">%*%</span><span class="st"> </span><span class="kw">solve</span>(Ve) <span class="op">%*%</span><span class="st"> </span>L2</a>
-<a class="sourceLine" id="cb10-3" title="3">V2 &lt;-<span class="st"> </span>L2inv <span class="op">%*%</span><span class="st"> </span>Ve <span class="op">%*%</span><span class="st"> </span><span class="kw">t</span>(L2inv)</a></code></pre></div>
-<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb11-1" title="1"><span class="kw">cat</span>(</a>
-<a class="sourceLine" id="cb11-2" title="2">  <span class="st">&quot;</span><span class="ch">\\</span><span class="st">begin{align} </span></a>
-<a class="sourceLine" id="cb11-3" title="3"><span class="st">    K_2 &amp;= &quot;</span>, <span class="kw">tex</span>(K2), <span class="st">&quot; </span><span class="ch">\\\\</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb11-4" title="4"><span class="st">   V_2 &amp;= &quot;</span>, <span class="kw">tex</span>(V2), <span class="st">&quot; </span></a>
-<a class="sourceLine" id="cb11-5" title="5"><span class="st">  </span><span class="ch">\\</span><span class="st">end{align}&quot;</span>, <span class="dt">sep =</span> <span class="st">&quot;&quot;</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb10-1" data-line-number="1">L2inv &lt;-<span class="st"> </span><span class="kw">solve</span>(L2)</a>
+<a class="sourceLine" id="cb10-2" data-line-number="2">K2 &lt;-<span class="st"> </span><span class="kw">t</span>(L2) <span class="op">%*%</span><span class="st"> </span><span class="kw">solve</span>(Ve) <span class="op">%*%</span><span class="st"> </span>L2</a>
+<a class="sourceLine" id="cb10-3" data-line-number="3">V2 &lt;-<span class="st"> </span>L2inv <span class="op">%*%</span><span class="st"> </span>Ve <span class="op">%*%</span><span class="st"> </span><span class="kw">t</span>(L2inv)</a></code></pre></div>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb11-1" data-line-number="1"><span class="kw">cat</span>(</a>
+<a class="sourceLine" id="cb11-2" data-line-number="2">  <span class="st">&quot;</span><span class="ch">\\</span><span class="st">begin{align} </span></a>
+<a class="sourceLine" id="cb11-3" data-line-number="3"><span class="st">    K_2 &amp;= &quot;</span>, <span class="kw">tex</span>(K2), <span class="st">&quot; </span><span class="ch">\\\\</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb11-4" data-line-number="4"><span class="st">   V_2 &amp;= &quot;</span>, <span class="kw">tex</span>(V2), <span class="st">&quot; </span></a>
+<a class="sourceLine" id="cb11-5" data-line-number="5"><span class="st">  </span><span class="ch">\\</span><span class="st">end{align}&quot;</span>, <span class="dt">sep =</span> <span class="st">&quot;&quot;</span>)</a></code></pre></div>
 <p><span class="math display">\[\begin{align} 
-    K_2 &amp;= \left( \begin{array}{cccc} \frac{1}{w_{1}}  + \frac{a_{1} ^{2}}{w_{2}}  + \frac{a_{2} ^{2}}{w_{2}}  + \frac{a_{3} ^{2}}{w_{2}}  &amp; \frac{ - a_{1}}{w_{2}}  &amp; \frac{ - a_{2}}{w_{2}}  &amp; \frac{ - a_{3}}{w_{2}}  \\ \frac{ - a_{1}}{w_{2}}  &amp; \frac{1}{w_{2}}  &amp; 0 &amp; 0 \\ \frac{ - a_{2}}{w_{2}}  &amp; 0 &amp; \frac{1}{w_{2}}  &amp; 0 \\ \frac{ - a_{3}}{w_{2}}  &amp; 0 &amp; 0 &amp; \frac{1}{w_{2}}  \end{array} \right)  \\ 
-   V_2 &amp;= \left( \begin{array}{cccc} w_{1} &amp; w_{1} a_{1} &amp; w_{1} a_{2} &amp; w_{1} a_{3} \\ a_{1} w_{1} &amp; w_{1} a_{1} ^{2} + w_{2} &amp; a_{1} w_{1} a_{2} &amp; a_{1} w_{1} a_{3} \\ a_{2} w_{1} &amp; a_{2} w_{1} a_{1} &amp; w_{1} a_{2} ^{2} + w_{2} &amp; a_{2} w_{1} a_{3} \\ a_{3} w_{1} &amp; a_{3} w_{1} a_{1} &amp; a_{3} w_{1} a_{2} &amp; w_{1} a_{3} ^{2} + w_{2} \end{array} \right)  
+    K_2 &amp;= \left( \begin{array}{cccc} \frac{1}{w_{1}}  + \frac{a_{1} ^{2}}{w_{2}}  + \frac{a_{2} ^{2}}{w_{2}}  + \frac{a_{3} ^{2}}{w_{2}}  &amp; \frac{ - a_{1}}{w_{2}}  &amp; \frac{ - a_{2}}{w_{2}}  &amp; \frac{ - a_{3}}{w_{2}}  \\ \frac{ - a_{1}}{w_{2}}  &amp; \frac{1}{w_{2}}  &amp; 0 &amp; 0 \\ \frac{ - a_{2}}{w_{2}}  &amp; 0 &amp; \frac{1}{w_{2}}  &amp; 0 \\ \frac{ - a_{3}}{w_{2}}  &amp; 0 &amp; 0 &amp; \frac{1}{w_{2}}  \end{array} \right) \\ 
+   V_2 &amp;= \left( \begin{array}{cccc} w_{1} &amp; w_{1} a_{1} &amp; w_{1} a_{2} &amp; w_{1} a_{3} \\ a_{1} w_{1} &amp; w_{1} a_{1} ^{2} + w_{2} &amp; a_{1} w_{1} a_{2} &amp; a_{1} w_{1} a_{3} \\ a_{2} w_{1} &amp; a_{2} w_{1} a_{1} &amp; w_{1} a_{2} ^{2} + w_{2} &amp; a_{2} w_{1} a_{3} \\ a_{3} w_{1} &amp; a_{3} w_{1} a_{1} &amp; a_{3} w_{1} a_{2} &amp; w_{1} a_{3} ^{2} + w_{2} \end{array} \right) 
   \end{align}\]</span></p>
 </div>
 

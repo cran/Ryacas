@@ -50,7 +50,109 @@ yac_symbol <- function(x) {
   return(ysym(x)) 
 }
 
+#' List defined yac_symbols
+#' 
+#' @param print_details print content of symbols
+#' 
+#' @export
+ysym_ls <- function(print_details = FALSE) {
+  x <- ls(envir = .GlobalEnv)
+  
+  idx <- sapply(x, function(v) is(get(v, envir = .GlobalEnv), "yac_symbol"))
+  
+  if (!any(idx)) {
+    return(invisible(c()))
+  }
+  
+  res <- x[idx]
+  
+  if (print_details) {
+    for (i in which(idx)) {
+      v <- x[i]
+      cat(v, ":\n", sep = "")
+      print(get(v, envir = .GlobalEnv))
+    }
+    
+    return(invisible(res))
+  }
+  
+  return(res)
+}
+
+# Construct and assign a vector of variables
+# 
+# If unnamed vector, the content is the variables.
+# 
+# If named vector, the names are the variables, 
+# and the values are the content.
+# 
+# Note, that it has the side effect that it assigns variables in 
+# `.GlobalEnv`.
+# 
+# @param x Vector of variable names. If named, the names are the variables 
+# and the content is the value.
+# @param overwrite overwrite if exists already
+# @param warn warn if name already exists in `.GlobalEnv`
+# 
+# @return Invisibly names assigned
+# 
+# @examples 
+# ysym_ls()
+# ysym_make(c("a", "b"))
+# ysym_ls()
+# a
+# 
+# ysym_make(c("xt" = "{{1, t}}", "xtk" = "{{1, t+k}}"))
+# ysym_ls()
+# xt
+# ysym_ls(print_details = TRUE)
+# 
+# # Warning
+# # ysym_make(c("a", "b"))
+# ysym_make(c("a" = "2", "b" = "3"), overwrite = TRUE, warn = FALSE)
+# a
+# 
+# @export
+# ysym_make <- function(x, overwrite = FALSE, warn = TRUE) {
+#   nms <- x
+#   vals <- x
+#   succ <- character(length(nms))
+#   
+#   if (!is.null(names(x))) {
+#     nms <- names(x)
+#   }
+#   
+#   res <- sapply(seq_along(nms), function(i) {
+#     do_assign <- TRUE
+#     
+#     # Check if name already exists
+#     if (exists(nms[i], envir = .GlobalEnv)) {
+#       if (warn && overwrite) {
+#         warning(paste0(nms[i], " already exists, overwriting"))
+#         do_assign <- TRUE
+#       } else if (warn && !overwrite) {
+#         warning(paste0(nms[i], " already exists, skipping"))
+#         do_assign <- FALSE
+#       } else {
+#         # warn == TRUE
+#         do_assign <- overwrite
+#       }
+#     }
+#     
+#     if (do_assign) {
+#       assign(nms[i], ysym(vals[i]), envir = .GlobalEnv)
+#       succ[i] <- nms[i]
+#     } else {
+#       succ[i] <- NA_character_
+#     }
+#   })
+#   
+#   return(invisible(succ))
+# }
+
+#########################################
 # S3 exports
+#########################################
 
 #' @export
 yac_str.yac_symbol <- function(x) {
@@ -81,6 +183,12 @@ yac_assign.yac_symbol <- function(value, x) {
 y_fn.yac_symbol <- function(x, fn, ...) {
   x <- y_fn(x$yacas_cmd, fn, ...)
   y <- yac_str(x)
+  
+  # Special case returning string
+  if (fn == "TeXForm") {
+    return(y)
+  }
+  
   z <- ysym(y)
   return(z)
 }
@@ -143,7 +251,9 @@ c.yac_symbol <- function(...) {
   }
   
   elements <- lapply(args, function(x) {
-    x$yacas_cmd
+    z <- x$yacas_cmd
+    z <- gsub("[{}]*", "", z)
+    return(z)
   })
   
   cmd <- paste0("{", paste0(elements, collapse = ", "), "}")
@@ -207,6 +317,10 @@ tex.yac_symbol <- function(x) {
   
   z <- y_fn(x_res$yacas_cmd, "TeXForm")
   z_res <- yac_str(z)
+  
+  # Trim
+  z_res <- gsub("^[ ]*", "", z_res)
+  z_res <- gsub("[ ]*$", "", z_res)
   
   return(z_res)
 }
@@ -594,12 +708,13 @@ solve.yac_symbol <- function(a, b, ...) {
         z <- base::`[`(x = w, i = i, )
       }
     } else {
+      # x[1:2,2]
       z <- base::`[`(x = w, i = i, j = j)
     }
   }
   
   stopifnot(!is.null(z))
-  v <- ysym(as_y(z))
+  v <- ysym(z)
   
   return(v)
 }
@@ -942,11 +1057,37 @@ integrate.yac_symbol <- function(f, var, lower, upper, ...) {
   return(v)
 }
 
+flat_op <- function(expr, op, identity) {
+  z <- expr
+  
+  while (grepl("{", z$yacas_cmd, fixed = TRUE)) {
+    z <- y_fn(z, "UnFlatten", op, identity)
+  }
+  
+  return(z)
+}
+
+
+#' Product of Vector Elements
+#' 
+#' @param expr Expression to be multiplied
+#' @param \dots Not used
+#' @param na.rm Not used
+#' 
+#' @concept yac_symbol
+#' 
+#' @export
+prod.yac_symbol <- function(expr, ..., na.rm = FALSE) {
+  z <- flat_op(expr, '"*"', '1')
+  return(z)
+}
 
 
 #' Summation
 #' 
-#' Sums `expr` by letting `var` taking values 
+#' If only `expr` given: sum elements.
+#' 
+#' Else: sums `expr` by letting `var` taking values 
 #' from `lower` to `upper` (potentially `Inf`)
 #' 
 #' @param expr Expression to be summed
@@ -960,6 +1101,11 @@ integrate.yac_symbol <- function(f, var, lower, upper, ...) {
 #' 
 #' @export
 sum.yac_symbol <- function(expr, var, lower, upper, ..., na.rm = FALSE) {
+  if (missing(var) && missing(lower) && missing(upper)) {
+    z <- flat_op(expr, '"+"', '0')
+    return(z)
+  }
+  
   lwr_str <- bound_to_str(lower)
   upr_str <- bound_to_str(upper)
   
@@ -969,6 +1115,57 @@ sum.yac_symbol <- function(expr, var, lower, upper, ..., na.rm = FALSE) {
   v <- ysym(z_res)
   
   return(v)
+}
+
+
+
+#' Combine R Objects by Rows
+#' 
+#' @param \dots Objects to bind
+#' @param deparse.level Not used
+#' 
+#' @concept yac_symbol
+#' 
+#' @export
+rbind.yac_symbol <- function(..., deparse.level = 1) {
+  args <- list(...)
+  ls <- lapply(args, length)
+  
+  if (length(unique(ls)) != 1L) {
+    stop("All must have same length")
+  }
+  
+  v <- unlist(lapply(args, function(x) {
+    if (x$is_mat) {
+      stop("Cannot bind matrices")
+    }
+    
+    # x$is_mat == FALSE
+    if (!x$is_vec) {
+      return(paste0("{", x$yacas_cmd, "}"))
+    }
+    
+    return(x$yacas_cmd)
+  }))
+  
+  z <- paste0("{", paste0(v, collapse = ", "), "}")
+  z <- ysym(z)
+  
+  return(z)
+}
+
+
+#' Combine R Objects by Columns
+#' 
+#' @param \dots Objects to bind
+#' @param deparse.level Not used
+#' 
+#' @concept yac_symbol
+#' 
+#' @export
+cbind.yac_symbol <- function(..., deparse.level = 1) {
+  # Not efficient, but easy for now...
+  return(t(rbind(..., deparse.level = deparse.level)))
 }
 
 
@@ -1018,3 +1215,40 @@ lim.yac_symbol <- function(f, var, val, ...) {
   
   return(v)
 }
+
+
+
+
+#' Give a variable a value
+#' 
+#' @param x yac_symbol
+#' @param var Variable
+#' @param val Value
+#' 
+#' @concept yac_symbol
+#' 
+#' @export
+with_value <- function(x, var, val) {
+  UseMethod("with_value")
+}
+
+#' @export
+with_value.default <- function(x, var, val) {
+  stop("Not implemented for anything else than yac_symbol's created with ysym()")
+}
+
+#' @export
+with_value.yac_symbol <- function(x, var, val) {
+  # WithValue(var, val, expr)
+  
+  cmd <- paste0("WithValue(", var, ", ", 
+                as.character(val), ", ", 
+                as.character(x), ")")
+  
+  z_res <- yac_str(cmd)
+  
+  v <- ysym(z_res)
+  
+  return(v)
+}
+
