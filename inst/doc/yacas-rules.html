@@ -8,11 +8,11 @@
 <meta name="generator" content="pandoc" />
 <meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1" />
 
 <meta name="author" content="Mikkel Meyer Andersen and Søren Højsgaard" />
 
-<meta name="date" content="2020-01-07" />
+<meta name="date" content="2020-04-14" />
 
 <title>User-defined yacas rules</title>
 
@@ -117,9 +117,6 @@ padding-right: 2em;
 font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
 font-size: 14px;
 line-height: 1.35;
-}
-#header {
-text-align: center;
 }
 #TOC {
 clear: both;
@@ -288,7 +285,8 @@ code > span.st { color: #d14; }
 code > span.co { color: #888888; font-style: italic; } 
 code > span.ot { color: #007020; } 
 code > span.al { color: #ff0000; font-weight: bold; } 
-code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61717; background-color: #e3d2d2; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
 </style>
 
 
@@ -303,7 +301,7 @@ code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61
 
 <h1 class="title toc-ignore">User-defined yacas rules</h1>
 <h4 class="author">Mikkel Meyer Andersen and Søren Højsgaard</h4>
-<h4 class="date">2020-01-07</h4>
+<h4 class="date">2020-04-14</h4>
 
 
 
@@ -312,7 +310,7 @@ code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61
 <h1>Included rules</h1>
 <p><code>yacas</code> comes with a number of rules all defined in the <code>yacas</code> directory of the installed package:</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" data-line-number="1"><span class="kw">system.file</span>(<span class="dt">package =</span> <span class="st">&quot;Ryacas&quot;</span>, <span class="st">&quot;yacas&quot;</span>)</a></code></pre></div>
-<pre><code>## [1] &quot;/tmp/RtmpDXywO7/Rinst70f443c8617/Ryacas/yacas&quot;</code></pre>
+<pre><code>## [1] &quot;/tmp/RtmpT01q0t/Rinst25785acc91ad/Ryacas/yacas&quot;</code></pre>
 <p>For example in the <code>sums.rep</code> folder, a number of rules for sums are defined in the <code>code.ys</code> file.</p>
 <p>As an example, the fact that <span class="math display">\[
   \sum_{k = 1}^n (2k-1) = n^2

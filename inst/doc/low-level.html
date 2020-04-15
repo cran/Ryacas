@@ -8,11 +8,11 @@
 <meta name="generator" content="pandoc" />
 <meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1" />
 
 <meta name="author" content="Mikkel Meyer Andersen and Søren Højsgaard" />
 
-<meta name="date" content="2020-01-07" />
+<meta name="date" content="2020-04-14" />
 
 <title>The low-level interface</title>
 
@@ -117,9 +117,6 @@ padding-right: 2em;
 font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
 font-size: 14px;
 line-height: 1.35;
-}
-#header {
-text-align: center;
 }
 #TOC {
 clear: both;
@@ -288,7 +285,8 @@ code > span.st { color: #d14; }
 code > span.co { color: #888888; font-style: italic; } 
 code > span.ot { color: #007020; } 
 code > span.al { color: #ff0000; font-weight: bold; } 
-code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61717; background-color: #e3d2d2; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
 </style>
 
 
@@ -303,7 +301,7 @@ code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61
 
 <h1 class="title toc-ignore">The low-level interface</h1>
 <h4 class="author">Mikkel Meyer Andersen and Søren Højsgaard</h4>
-<h4 class="date">2020-01-07</h4>
+<h4 class="date">2020-04-14</h4>
 
 
 
@@ -507,7 +505,7 @@ code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61
 <div class="sourceCode" id="cb89"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb89-1" data-line-number="1"><span class="kw">yac_silent</span>(<span class="st">&quot;poly := (x-3)*(x+2)&quot;</span>)</a></code></pre></div>
 <p>We can now list <code>yacas</code> variables (<code>I</code> is the imaginary unit):</p>
 <div class="sourceCode" id="cb90"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb90-1" data-line-number="1"><span class="kw">yac_str</span>(<span class="st">&quot;Variables()&quot;</span>)</a></code></pre></div>
-<pre><code>## [1] &quot;{poly,t,Arow,rformBitwiseOps,j,I,TeXForm'FuncPrec,nd}&quot;</code></pre>
+<pre><code>## [1] &quot;{t,nd,TeXForm'FuncPrec,j,poly,rformBitwiseOps,I,Arow}&quot;</code></pre>
 <div class="sourceCode" id="cb92"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb92-1" data-line-number="1"><span class="kw">yac_str</span>(<span class="st">&quot;Expand(poly)&quot;</span>)</a></code></pre></div>
 <pre><code>## [1] &quot;x^2-x-6&quot;</code></pre>
 <div class="sourceCode" id="cb94"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb94-1" data-line-number="1"><span class="st">&quot;poly&quot;</span> <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">y_fn</span>(<span class="st">&quot;Expand&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">yac_str</span>()</a></code></pre></div>

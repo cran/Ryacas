@@ -166,9 +166,9 @@ LocalSymbols(rformMathFunctions) [
       {"ArcTanh","atanh"},
       {"Max","max"},
       {"Min","min"},
-      {"Abs","fabs"},
+      {"Abs","abs"},
       {"Floor","floor"},
-      {"Ceil","ceil"},
+      {"Ceil","ceiling"},
       {"!","factorial"}
     };
 
