@@ -31,7 +31,11 @@ L2s
 
 ## -----------------------------------------------------------------------------
 K2s <- L2s %*% t(L2s)
-V2s <- simplify(solve(K2s))
+V2s <- solve(K2s)
+# Try simplify; causes timeout on CRAN Fedora, hence in try() call.
+# Else, just use 
+# V2s <- simplify(solve(K2s))
+try(V2s <- simplify(V2s), silent = TRUE)
 
 ## ---- results="asis"----------------------------------------------------------
 cat(

@@ -12,7 +12,7 @@
 
 <meta name="author" content="Mikkel Meyer Andersen and Søren Højsgaard" />
 
-<meta name="date" content="2020-04-14" />
+<meta name="date" content="2020-11-15" />
 
 <title>User-defined yacas rules</title>
 
@@ -37,7 +37,7 @@ a.sourceLine { text-indent: -1em; padding-left: 1em; }
 pre.numberSource a.sourceLine
   { position: relative; left: -4em; }
 pre.numberSource a.sourceLine::before
-  { content: attr(data-line-number);
+  { content: attr(title);
     position: relative; left: -1em; text-align: right; vertical-align: baseline;
     border: none; pointer-events: all; display: inline-block;
     -webkit-touch-callout: none; -webkit-user-select: none;
@@ -301,16 +301,16 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 <h1 class="title toc-ignore">User-defined yacas rules</h1>
 <h4 class="author">Mikkel Meyer Andersen and Søren Højsgaard</h4>
-<h4 class="date">2020-04-14</h4>
+<h4 class="date">2020-11-15</h4>
 
 
 
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1"><span class="kw">library</span>(Ryacas)</a></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" title="1"><span class="kw">library</span>(Ryacas)</a></code></pre></div>
 <div id="included-rules" class="section level1">
 <h1>Included rules</h1>
 <p><code>yacas</code> comes with a number of rules all defined in the <code>yacas</code> directory of the installed package:</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" data-line-number="1"><span class="kw">system.file</span>(<span class="dt">package =</span> <span class="st">&quot;Ryacas&quot;</span>, <span class="st">&quot;yacas&quot;</span>)</a></code></pre></div>
-<pre><code>## [1] &quot;/tmp/RtmpT01q0t/Rinst25785acc91ad/Ryacas/yacas&quot;</code></pre>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" title="1"><span class="kw">system.file</span>(<span class="dt">package =</span> <span class="st">&quot;Ryacas&quot;</span>, <span class="st">&quot;yacas&quot;</span>)</a></code></pre></div>
+<pre><code>## [1] &quot;/tmp/Rtmpj9GSJ6/Rinst33095a4066/Ryacas/yacas&quot;</code></pre>
 <p>For example in the <code>sums.rep</code> folder, a number of rules for sums are defined in the <code>code.ys</code> file.</p>
 <p>As an example, the fact that <span class="math display">\[
   \sum_{k = 1}^n (2k-1) = n^2
@@ -319,12 +319,12 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <p>and the geometric sum is defined as</p>
 <pre><code>SumFunc(_k,0,_n,(r_IsFreeOf(k))^(_k), (1-r^(n+1))/(1-r) );</code></pre>
 <p>These can be verified:</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" data-line-number="1"><span class="kw">yac_str</span>(<span class="st">&quot;Sum(i, 1, m, 2*i-1)&quot;</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" title="1"><span class="kw">yac_str</span>(<span class="st">&quot;Sum(i, 1, m, 2*i-1)&quot;</span>)</a></code></pre></div>
 <pre><code>## [1] &quot;m^2&quot;</code></pre>
-<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" data-line-number="1"><span class="kw">yac_str</span>(<span class="st">&quot;Sum(i, 0, m, 2^i)&quot;</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" title="1"><span class="kw">yac_str</span>(<span class="st">&quot;Sum(i, 0, m, 2^i)&quot;</span>)</a></code></pre></div>
 <pre><code>## [1] &quot;2^(m+1)-1&quot;</code></pre>
 <p>There are also rules in <code>yacas</code> that are able to let the user change some limits of some sums, e.g. for the geometric sum:</p>
-<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb10-1" data-line-number="1"><span class="kw">yac_str</span>(<span class="st">&quot;Sum(i, 1, m, 2^i)&quot;</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb10-1" title="1"><span class="kw">yac_str</span>(<span class="st">&quot;Sum(i, 1, m, 2^i)&quot;</span>)</a></code></pre></div>
 <pre><code>## [1] &quot;2^(m+1)-2&quot;</code></pre>
 </div>
 <div id="custom-rules" class="section level1">
@@ -334,12 +334,12 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 \]</span> then know that <span class="math display">\[
   \sum_{k = 0}^n (2k-1) = -1 + \sum_{k = 1}^n (2k-1) = n^2 - 1 .
 \]</span> But what does <code>yacas</code> say?</p>
-<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb12-1" data-line-number="1"><span class="kw">yac_str</span>(<span class="st">&quot;Sum(i, 0, m, 2*i-1)&quot;</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb12-1" title="1"><span class="kw">yac_str</span>(<span class="st">&quot;Sum(i, 0, m, 2*i-1)&quot;</span>)</a></code></pre></div>
 <pre><code>## [1] &quot;Sum(i,0,m,2*i-1)&quot;</code></pre>
 <p>We can then add our own rule by:</p>
-<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb14-1" data-line-number="1"><span class="kw">yac_silent</span>(<span class="st">&quot;SumFunc(_k,0,_n,2*_k-1, n^2 - 1)&quot;</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb14-1" title="1"><span class="kw">yac_silent</span>(<span class="st">&quot;SumFunc(_k,0,_n,2*_k-1, n^2 - 1)&quot;</span>)</a></code></pre></div>
 <p>And then try again:</p>
-<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb15-1" data-line-number="1"><span class="kw">yac_str</span>(<span class="st">&quot;Sum(i, 0, m, 2*i-1)&quot;</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb15-1" title="1"><span class="kw">yac_str</span>(<span class="st">&quot;Sum(i, 0, m, 2*i-1)&quot;</span>)</a></code></pre></div>
 <pre><code>## [1] &quot;m^2-1&quot;</code></pre>
 <p>A good source of inspiration for writing custom rules is reading the included rules, but there is a lot to programming in <code>yacas</code> and we refer to <code>yacas</code>’s documentation, specifically the chapter <a href="https://yacas.readthedocs.io/en/latest/programming_in_yacas/">Programming in Yacas</a>.</p>
 </div>
