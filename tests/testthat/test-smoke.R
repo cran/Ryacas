@@ -1,7 +1,7 @@
 context("Ryacas smoke tests")
 
 test_that("Version", {
-  expect_equal(yac_str("Version()"), "1.7.1")
+  expect_equal(yac_str("Version()"), "1.9.2")
 })
 
 test_that("yac_str()", {
@@ -29,10 +29,10 @@ test_that("yac_core()", {
 })
 
 test_that("yac()", {
-  expect_equal(yac("Version()"), "1.7.1")
-  expect_equal(yac("Version()", rettype = "str"), "1.7.1")
-  expect_equal(yac("Version()", rettype = "expr"), expression("1.7.1"))
-  expect_equal(yac("Version()", rettype = "silent"), invisible("1.7.1"))
+  expect_equal(yac("Version()"), "1.9.2")
+  expect_equal(yac("Version()", rettype = "str"), "1.9.2")
+  expect_equal(yac("Version()", rettype = "expr"), expression("1.9.2"))
+  expect_equal(yac("Version()", rettype = "silent"), invisible("1.9.2"))
 })
 
 test_that("y_*()", {
@@ -77,3 +77,14 @@ test_that("y_fn()", {
   expect_equal(x[2L], "(x+1)*(x-1);")
 })
 
+# y_eval
+
+test_that("y_eval(as.r=FALSE)", {
+  eq <- ysym("2*y+x^2+2*x-3")
+  expect_equal(y_eval(eq, x=3, y=2)$yacas_cmd, "16")
+})
+
+test_that("y_eval(as.r=TRUE)", {
+  eq <- ysym("2*y+x^2+2*x-3")
+  expect_equal(y_eval(eq, x=3, y=2, as.r=TRUE), 16)
+})
