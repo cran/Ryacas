@@ -12,7 +12,7 @@
 
 <meta name="author" content="Mikkel Meyer Andersen and Søren Højsgaard" />
 
-<meta name="date" content="2023-01-11" />
+<meta name="date" content="2023-01-16" />
 
 <title>The low-level interface</title>
 
@@ -340,7 +340,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 <h1 class="title toc-ignore">The low-level interface</h1>
 <h4 class="author">Mikkel Meyer Andersen and Søren Højsgaard</h4>
-<h4 class="date">2023-01-11</h4>
+<h4 class="date">2023-01-16</h4>
 
 
 
@@ -589,7 +589,7 @@ can use <code>R</code>’s facilities:</p>
 <p>We can now list <code>yacas</code> variables (<code>I</code> is the
 imaginary unit):</p>
 <div class="sourceCode" id="cb90"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb90-1"><a href="#cb90-1" aria-hidden="true" tabindex="-1"></a><span class="fu">yac_str</span>(<span class="st">&quot;Variables()&quot;</span>)</span></code></pre></div>
-<pre><code>## [1] &quot;{poly,t,j,TeXForm&#39;FuncPrec,I,rformBitwiseOps,Arow,nd}&quot;</code></pre>
+<pre><code>## [1] &quot;{t,rformBitwiseOps,TeXForm&#39;FuncPrec,I,j,poly,Arow,nd}&quot;</code></pre>
 <div class="sourceCode" id="cb92"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb92-1"><a href="#cb92-1" aria-hidden="true" tabindex="-1"></a><span class="fu">yac_str</span>(<span class="st">&quot;Expand(poly)&quot;</span>)</span></code></pre></div>
 <pre><code>## [1] &quot;x^2-x-6&quot;</code></pre>
 <div class="sourceCode" id="cb94"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb94-1"><a href="#cb94-1" aria-hidden="true" tabindex="-1"></a><span class="st">&quot;poly&quot;</span> <span class="sc">%&gt;%</span> <span class="fu">y_fn</span>(<span class="st">&quot;Expand&quot;</span>) <span class="sc">%&gt;%</span> <span class="fu">yac_str</span>()</span></code></pre></div>

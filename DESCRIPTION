@@ -1,5 +1,5 @@
 Package: Ryacas
-Version: 1.1.4
+Version: 1.1.5
 Title: R Interface to the 'Yacas' Computer Algebra System
 Authors@R: c(
     person(given = "Mikkel Meyer", family = "Andersen",
@@ -32,7 +32,7 @@ BugReports: https://github.com/r-cas/ryacas/issues
 RoxygenNote: 7.2.3
 VignetteBuilder: knitr
 NeedsCompilation: yes
-Packaged: 2023-01-11 10:48:37 UTC; mikl
+Packaged: 2023-01-16 14:28:42 UTC; mikl
 Author: Mikkel Meyer Andersen [aut, cre, cph],
   Rob Goedman [aut, cph],
   Gabor Grothendieck [aut, cph],
@@ -42,4 +42,4 @@ Author: Mikkel Meyer Andersen [aut, cre, cph],
   Nemanja Trifunovic [cph] (UTF-8 part of yacas
     (src/yacas/include/yacas/utf8*))
 Repository: CRAN
-Date/Publication: 2023-01-12 08:40:11 UTC
+Date/Publication: 2023-01-16 18:30:02 UTC
